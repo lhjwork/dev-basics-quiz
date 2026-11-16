@@ -1,0 +1,236 @@
+/* 학습지 디자인: 모눈종이 위의 시험지 한 장 + 빨간 색연필 채점 + 노란 형광펜 */
+:root {
+  color-scheme: light dark;
+  --paper: #fcfdfe;   /* 시험지 */
+  --desk: #eef2f7;    /* 책상(바탕) */
+  --ink: #1b2333;     /* 인쇄 잉크 */
+  --sub: #5b6678;     /* 흐린 글씨 */
+  --grid: #dce3ec;    /* 모눈·괘선 */
+  --red: #e5342b;     /* 채점 색연필 */
+  --hl: #ffe45c;      /* 형광펜 */
+  --hl-soft: #fff6c4; /* 형광펜으로 칠한 면 */
+  --blue: #2747d8;    /* 볼펜: 직접 써 보는 칸 */
+  --code: #f2f5f9;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --serif: "Noto Serif KR", "AppleMyungjo", "Batang", serif;
+  --mono: "IBM Plex Mono", "D2Coding", Menlo, Consolas, monospace;
+  --pen: "Nanum Pen Script", "Apple SD Gothic Neo", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1a1f28; --desk: #11151b; --ink: #e9edf3; --sub: #9aa6b8; --grid: #2c3442;
+    --red: #ff6a5e; --hl: #c9ae2b; --hl-soft: #3a3415; --blue: #93a8ff; --code: #131820;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background-color: var(--desk);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font: 16px/1.7 var(--sans);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+#app {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 28px 40px 44px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+/* ── 첫 화면: 차례 ── */
+.title {
+  display: inline;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  background: linear-gradient(transparent 60%, var(--hl) 60%);
+}
+.lead { margin: 14px 0 0; color: var(--sub); max-width: 34em; }
+.mode { display: block; margin: 20px 0 8px; font-size: 15px; cursor: pointer; }
+.mode input { accent-color: var(--ink); margin-right: 6px; }
+.home { display: grid; grid-template-columns: 1fr 1fr; gap: 0 44px; margin-top: 12px; }
+.topic {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--grid);
+  background: none;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: left;
+}
+.topic .leader { flex: 1; border-bottom: 2px dotted var(--grid); transform: translateY(-5px); }
+.topic .tc { color: var(--sub); font-size: 15px; font-variant-numeric: tabular-nums; }
+.topic:hover .tn, .topic:focus-visible .tn { background: linear-gradient(transparent 55%, var(--hl) 55%); }
+
+/* ── 학습지 머리: 종류 / 난이도 / 문제 번호 칸 ── */
+.sheet-head { display: flex; align-items: stretch; border: 1.5px solid var(--ink); }
+.back { padding: 8px 16px; border: 0; border-right: 1.5px solid var(--ink); background: none; font-size: 14px; font-weight: 500; }
+.back:hover { background: var(--hl-soft); }
+.field { display: flex; flex-direction: column; justify-content: center; padding: 6px 16px; border-right: 1px solid var(--grid); }
+.field:first-of-type { flex: 1; }
+.field:last-child { border-right: 0; }
+.field span { font-size: 12px; color: var(--sub); line-height: 1.3; }
+.field b { font-size: 15px; line-height: 1.4; }
+
+/* 진행 칸: 푼 문제마다 채점 표시가 쌓인다 */
+.track { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; margin: 10px 0 30px; padding: 0; }
+.track li {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--grid);
+  color: var(--red);
+  font: 22px/1 var(--pen);
+}
+.track li.now { border: 2px solid var(--ink); }
+
+/* ── 문제 ── */
+.stem {
+  margin: 0 0 16px;
+  padding-left: 1.7em;
+  text-indent: -1.7em;
+  font: 600 21px/1.6 var(--serif);
+  white-space: pre-wrap;
+}
+.qno { display: inline-block; width: 1.7em; text-indent: 0; font-weight: 700; }
+pre {
+  margin: 12px 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  background: var(--code);
+  border-left: 3px solid var(--ink);
+  font: 14px/1.65 var(--mono);
+  tab-size: 4;
+}
+pre.err { border-left-color: var(--red); }
+
+/* 개념: 형광펜으로 칠한 상자 */
+details { margin: 16px 0; padding: 10px 16px; border: 1px solid var(--grid); }
+summary { font-weight: 700; cursor: pointer; }
+details.concept { border: 0; border-left: 6px solid var(--hl); background: var(--hl-soft); }
+details.concept pre { background: var(--paper); }
+.ex { margin-top: 10px; padding-left: 14px; border-left: 3px solid var(--grid); white-space: pre-wrap; }
+details .ex { padding-left: 0; border-left: 0; }
+details:not(.concept) .ex + .ex { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--grid); }
+.ex.bad { border-left-color: var(--red); }
+h3 { margin: 28px 0 6px; font-size: 15px; font-weight: 700; }
+
+/* 직접 실행해 보기: 볼펜으로 써 보는 칸 */
+.run { margin: 18px 0 26px; padding: 14px 16px 12px; border: 1.5px solid var(--blue); }
+.run > b { display: block; color: var(--blue); font-size: 14px; }
+textarea {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--grid);
+  border-radius: 0;
+  background: var(--code);
+  color: var(--ink);
+  font: 14px/1.65 var(--mono);
+  tab-size: 4;
+  resize: vertical;
+}
+textarea.code { margin-top: 8px; }
+.bar button { margin: 10px 8px 4px 0; padding: 6px 14px; border: 1px solid var(--ink); background: none; font-size: 14px; }
+.bar button:hover { background: var(--hl-soft); }
+.bar button.go, .bar button.go:hover { border-color: var(--blue); background: var(--blue); color: var(--paper); font-weight: 700; }
+
+/* 실행 결과 표 */
+.scroll { margin: 10px 0 16px; overflow-x: auto; }
+.tname { font-size: 14px; font-weight: 700; }
+table { border-collapse: collapse; font: 13.5px/1.5 var(--mono); }
+th, td { padding: 5px 14px 5px 0; text-align: left; white-space: nowrap; }
+th { border-bottom: 2px solid var(--ink); }
+td { border-bottom: 1px solid var(--grid); }
+td.null { color: var(--sub); font-style: italic; }
+.meta { margin: 6px 0; color: var(--sub); font-size: 14px; }
+.err { color: var(--red); white-space: pre-wrap; }
+
+/* ── 보기 ①②③④ 와 채점 ── */
+.choice {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  width: 100%;
+  padding: 11px 8px;
+  border: 0;
+  border-bottom: 1px solid var(--grid);
+  background: none;
+  font-size: 17px;
+  text-align: left;
+  white-space: pre-wrap;
+}
+.choice:hover:not(:disabled) { background: var(--hl-soft); }
+.choice:disabled { color: var(--sub); }
+.choice.ok, .choice.bad { color: var(--ink); }
+.choice.ok { font-weight: 700; }
+.num { position: relative; flex: none; font-size: 20px; line-height: 1; }
+.choice.ok .num::after {   /* 정답: 색연필 동그라미 */
+  content: "";
+  position: absolute;
+  inset: -8px -10px -9px -9px;
+  border: 2.5px solid var(--red);
+  border-radius: 50% 44% 52% 46%;
+  transform: rotate(-12deg);
+  animation: draw 0.35s ease-out;
+}
+.choice.bad .num::after {  /* 고른 오답: 빗금 */
+  content: "";
+  position: absolute;
+  left: -40%;
+  top: 50%;
+  width: 180%;
+  height: 2.5px;
+  background: var(--red);
+  transform: rotate(-52deg);
+  animation: draw 0.25s ease-out;
+}
+@keyframes draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+.skip { width: 100%; margin-top: 10px; padding: 10px; border: 1px dashed var(--sub); background: none; color: var(--sub); font-size: 15px; }
+.skip:hover:not(:disabled) { color: var(--ink); border-color: var(--ink); }
+.next { display: block; margin: 28px 0 0 auto; padding: 12px 30px; border: 0; background: var(--ink); color: var(--paper); font-weight: 700; }
+.next + .next { margin-top: 10px; }
+
+/* ── 결과: 손글씨 점수에 밑줄 두 줄 ── */
+.score { margin: 8px 0 26px; }
+.score b {
+  display: inline-block;
+  padding: 0 10px 2px;
+  border-bottom: 7px double var(--red);
+  color: var(--red);
+  font: 400 104px/1 var(--pen);
+  transform: rotate(-4deg);
+}
+.score small { display: block; margin-top: 14px; color: var(--sub); font-size: 15px; }
+h1 { font-size: 26px; margin: 20px 0 0; }
+h2 { font-size: 18px; margin: 28px 0 8px; }
+ul { padding-left: 1.2em; }
+li { margin: 4px 0; }
+
+@media (max-width: 640px) {
+  body { padding: 0; background: var(--paper); }
+  #app { padding: 20px 16px 40px; border: 0; }
+  .title { font-size: 32px; }
+  .home { grid-template-columns: 1fr; }
+  .stem { font-size: 19px; }
+  .field { padding: 6px 10px; }
+  .score b { font-size: 84px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .choice .num::after { animation: none; }
+}
