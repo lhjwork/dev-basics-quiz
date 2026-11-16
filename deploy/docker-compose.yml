@@ -1,10 +1,12 @@
-# 서버 배포 구성: HTTPS(caddy) → 학습지(quiz) [→ 전용 MSSQL(mssql)]
+# 서버 배포 구성: [HTTPS 입구] → 학습지(quiz) [→ 전용 MSSQL(mssql)]
 # 사용: 이 폴더에 .env 를 만들고(.env.example 참고)
-#   메모리 4GB 미만 서버:  docker compose up -d --build                 (SQL 실행 꺼짐)
-#   메모리 4GB 이상 서버:  docker compose --profile sql up -d --build   (.env 에 QUIZ_SQL_HOST=mssql,1433)
+#   docker compose up -d --build                    학습지만. 이미 있는 웹 서버(nginx 등)가 quiz_inner 망으로 연결한다
+#   docker compose --profile caddy up -d --build    웹 서버가 없는 서버: HTTPS 입구(caddy)까지 함께 띄운다
+#   docker compose --profile sql up -d --build      메모리 4GB 이상: SQL 실행용 MSSQL까지 (.env 에 QUIZ_SQL_HOST=mssql,1433)
 services:
-  # 밖에서 들어오는 유일한 입구. 인증서를 자동으로 발급받아 HTTPS로 받는다.
+  # 80·443이 비어 있는 서버용 입구. 인증서를 자동으로 발급받아 HTTPS로 받는다.
   caddy:
+    profiles: [caddy]
     image: caddy:2
     restart: unless-stopped
     ports: ["80:80", "443:443"]
@@ -49,6 +51,7 @@ services:
 networks:
   web: {}
   inner:
+    name: quiz_inner
     internal: true   # 이 망의 컨테이너는 인터넷으로 나갈 수 없다
 
 volumes:
