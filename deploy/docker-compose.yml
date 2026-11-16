@@ -1,0 +1,52 @@
+# 서버 배포 구성: HTTPS(caddy) → 학습지(quiz) → 전용 MSSQL(mssql)
+# 사용: 이 폴더에 .env 를 만들고(.env.example 참고)  docker compose up -d --build
+services:
+  # 밖에서 들어오는 유일한 입구. 인증서를 자동으로 발급받아 HTTPS로 받는다.
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      QUIZ_DOMAIN: ${QUIZ_DOMAIN:?}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    networks: [web, inner]
+    depends_on: [quiz]
+
+  # 학습지. 받은 코드를 실행하므로 인터넷이 없는 내부망에만 두고 자원과 권한을 제한한다.
+  quiz:
+    build: ..
+    restart: unless-stopped
+    environment:
+      QUIZ_PUBLIC_ORIGIN: https://${QUIZ_DOMAIN:?}
+      QUIZ_PASSWORD: ${QUIZ_PASSWORD:?}
+      QUIZ_SQL_HOST: mssql,1433
+      QUIZ_SQL_PASSWORD: ${MSSQL_SA_PASSWORD:?}
+    networks: [inner]
+    mem_limit: 1500m
+    cpus: 1.5
+    pids_limit: 300
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on: [mssql]
+
+  # 학습지 전용 DB. 다른 데이터는 넣지 않는다.
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      MSSQL_MEMORY_LIMIT_MB: "1024"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?}
+    networks: [inner]
+    mem_limit: 2g
+
+networks:
+  web: {}
+  inner:
+    internal: true   # 이 망의 컨테이너는 인터넷으로 나갈 수 없다
+
+volumes:
+  caddy_data: {}

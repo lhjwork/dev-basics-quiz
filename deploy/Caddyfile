@@ -1,0 +1,3 @@
+{$QUIZ_DOMAIN} {
+	reverse_proxy quiz:5080
+}
