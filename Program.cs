@@ -49,7 +49,9 @@ app.Use(async (ctx, next) =>
     await next();
 });
 app.UseDefaultFiles();
-app.UseStaticFiles();
+// 배포하면 바로 새 파일을 쓰도록 매번 서버에 확인한다(바뀌지 않았으면 304 로 짧게 끝난다).
+// 확인하지 않으면 브라우저가 옛 app.js 를 새 index.html 과 섞어 써서 화면이 깨진다.
+app.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = c => c.Context.Response.Headers.CacheControl = "no-cache" });
 
 var sqlHost = Environment.GetEnvironmentVariable("QUIZ_SQL_HOST") ?? "localhost,1433";
 var connStr = new SqlConnectionStringBuilder
@@ -66,9 +68,12 @@ var gate = new SemaphoreSlim(1, 1);
 
 // 일본어 학습지: 같은 화면을 열고 app.js 가 주소(/ja)를 보고 일본어 문제만 보여 준다.
 // /ja/ 로 오면 q/*.js 같은 상대 경로가 /ja/q/ 로 풀리므로 /ja 로 보낸다.
-app.MapGet("/ja", (HttpContext ctx) => ctx.Request.Path.Value!.EndsWith('/')
-    ? Results.Redirect("/ja")
-    : Results.File(Path.Combine(app.Environment.WebRootPath, "index.html"), "text/html; charset=utf-8"));
+app.MapGet("/ja", (HttpContext ctx) =>
+{
+    if (ctx.Request.Path.Value!.EndsWith('/')) return Results.Redirect("/ja");
+    ctx.Response.Headers.CacheControl = "no-cache";
+    return Results.File(Path.Combine(app.Environment.WebRootPath, "index.html"), "text/html; charset=utf-8");
+});
 app.MapLearn();
 app.MapPost("/run/sql", (RunRequest req) => Locked(() => RunSql(req)));
 app.MapPost("/run/{lang}", (string lang, RunRequest req) => Locked(() => RunCode(lang, req.Code)));

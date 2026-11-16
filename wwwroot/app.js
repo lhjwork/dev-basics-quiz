@@ -163,8 +163,37 @@ const JA = /\/ja\/?$/.test(globalThis.location?.pathname ?? '');
 const POOL = Q.filter(x => isJa(x) === JA);
 document.title = JA ? '일본어 학습지' : '기초 학습지';
 
+// 화면마다 주소(#t=종류&n=번호, #words, #stats)를 둬서 브라우저 뒤로 가기가 앞 화면으로 돌아오게 한다.
+let listKey = null;   // 지금 푸는 묶음(같은 묶음 안에서 오가면 채점 기록을 유지한다)
+function go(h) { if (location.hash.slice(1) === h) route(); else location.hash = h; }
+function goAt(n) { const p = new URLSearchParams(location.hash.slice(1)); p.set('n', n); go(p.toString()); }
+function route() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  if (JA && p.has('words')) return needLogin(words);
+  if (JA && p.has('stats')) return needLogin(stats);
+  const t = p.get('t'), ids = p.get('ids');
+  const qs = ids ? ids.split(',').map(id => POOL.find(x => x.id === id)).filter(Boolean)
+    : t === '전체' ? POOL : POOL.filter(x => x.t === t);
+  if (!qs.length) return home();
+  const key = t ?? ids;
+  if (key !== listKey) { list = qs; listKey = key; res.length = hinted.length = 0; }
+  i = Math.min(Math.max(+p.get('n') || 0, 0), list.length);
+  show();
+}
+addEventListener('hashchange', route);
+
 function home() {
+  listKey = null;
+  scrollTo(0, 0);
+  // 개발 / 일본어 학습지는 주소로 나뉜다. 맨 위에서 오간다.
+  const tabs = el('nav', null, 'tabs');
+  [['개발', '/'], ['일본어', '/ja']].forEach(([label, href]) => {
+    const a = el('a', label, (href === '/ja') === JA ? 'on' : '');
+    a.href = href;
+    tabs.append(a);
+  });
   app.replaceChildren(
+    tabs,
     el('h1', document.title, 'title'),
     el('p', JA ? '종류를 골라서 풀어 보세요. 문제마다 개념과 예문을 먼저 읽고 풀어요.'
                : '종류를 골라서 풀어 보세요. 문제마다 개념을 먼저 읽고, 코드를 직접 쳐서 실행해 볼 수 있어요.', 'lead'));
@@ -172,7 +201,7 @@ function home() {
   const add = (label, qs) => {
     const b = el('button', null, 'topic');
     b.append(el('span', label, 'tn'), el('span', null, 'leader'), el('span', `${qs.length}문제`, 'tc'));
-    b.onclick = () => { list = qs; i = 0; res.length = hinted.length = 0; show(); };
+    b.onclick = () => go(new URLSearchParams({ t: label }).toString());
     grid.append(b);
   };
   for (const t of new Set(POOL.map(x => x.t))) add(t, POOL.filter(x => x.t === t));
@@ -196,7 +225,7 @@ function show() {
   // 학습지 머리(종류 / 난이도 / 문제 번호)와 채점 표시가 쌓이는 진행 칸
   const head = el('header', null, 'sheet-head');
   const back = el('button', '종류 선택', 'back');
-  back.onclick = home;
+  back.onclick = () => go('');
   const field = (name, value) => {
     const f = el('div', null, 'field');
     f.append(el('span', name), el('b', value));
@@ -238,6 +267,7 @@ function show() {
   const skip = el('button', '모르겠어요 (찍지 말고 이걸 누르세요)', 'skip');
   skip.onclick = () => answer(-1);
   app.append(...btns, skip);
+  if (JA) furi(app);
 
   function answer(n) {
     // 학습 모드에서는 개념을 보는 게 정상이라 '보고 맞음'으로 따로 세지 않는다.
@@ -257,8 +287,9 @@ function show() {
     others.append(el('summary', wrong ? '나머지 오답 보기는 왜 넣었을까' : '오답 보기는 왜 넣었을까'));
     order.filter(m => m !== x.a && m !== n).forEach(m => others.append(el('div', why(m), 'ex')));
     const next = el('button', i + 1 < list.length ? '다음 문제' : '결과 보기', 'next');
-    next.onclick = () => { i++; show(); };
+    next.onclick = () => goAt(i + 1);
     app.append(others, next);
+    if (JA) furi(app);
   }
 }
 
@@ -373,8 +404,8 @@ function result() {
   const copy = el('button', '결과 복사', 'next');
   copy.onclick = () => { ta.select(); navigator.clipboard?.writeText(ta.value); copy.textContent = '복사됨'; };
   const again = el('button', '같은 문제 다시 풀기', 'next');
-  again.onclick = () => { i = 0; res.length = hinted.length = 0; show(); };
+  again.onclick = () => { res.length = hinted.length = 0; goAt(0); };
   app.append(ta, copy, again);
 }
 
-home();
+route();

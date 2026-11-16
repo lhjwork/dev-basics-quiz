@@ -260,3 +260,14 @@ li { margin: 4px 0; }
   .bars { grid-template-columns: 1fr; gap: 2px; }
   .bars .bl { margin-top: 8px; }
 }
+
+/* 개발 / 일본어 탭 */
+.tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.tabs a { padding: 6px 16px; border: 1.5px solid var(--ink); color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; }
+.tabs a.on { background: var(--ink); color: #fff; }
+
+/* 일본어: 한자 위 읽기(후리가나)와 예문 읽어 주기 */
+rt { font-size: 0.55em; color: var(--sub); font-weight: 400; }
+pre.spk { line-height: 2.2; }
+.say-line { margin-right: 6px; padding: 0 6px; border: 1px solid var(--grid); background: none; font-size: 13px; line-height: 1.6; cursor: pointer; }
+.say-line:hover { background: var(--hl-soft); }

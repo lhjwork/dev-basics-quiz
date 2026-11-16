@@ -14,7 +14,8 @@ const node = () => ({
   append(...c) { this.children.push(...c); }, replaceChildren(...c) { this.children = c; },
   focus() {}, select() {}, setRangeText() {},
 });
-const ctx = vm.createContext({ console, document: { getElementById: node, createElement: node }, scrollTo() {}, navigator: {} });
+const ctx = vm.createContext({ console, document: { getElementById: node, createElement: node }, scrollTo() {}, navigator: {},
+  URLSearchParams, location: { pathname: '/', hash: '' }, addEventListener() {} });
 let failed = 0;
 ctx.console = { ...console, assert: (ok, msg) => { if (!ok) { failed++; console.log('데이터 오류:', msg); } } };
 vm.runInContext(inline, ctx);
@@ -27,6 +28,7 @@ console.log(`문제 ${Q.length}개`, topics);
 
 vm.runInContext(`
   list = Q; i = 0; learning = false;
+  goAt = n => { i = n; show(); };                      // 화면 주소 대신 바로 다음 문제로
   for (let n = 0; n < Q.length; n++) {
     show();
     const buttons = app.children.filter(c => c.onclick);
@@ -34,6 +36,12 @@ vm.runInContext(`
     app.children.filter(c => c.onclick).at(-1).onclick();   // 다음 문제
   }
 `, ctx);
+// 일본어 문제의 한자에 읽기(q/jp-yomi.js)가 다 있는지
+const noYomi = vm.runInContext(`[...new Set(Q.filter(isJa)
+  .flatMap(x => [x.q, x.code, x.say, x.c, conceptOf(x), x.ex, wrongOf(x), x.v].flat(2))
+  .filter(s => typeof s === 'string')
+  .flatMap(s => yomiParts(s).filter(p => p.length === 1).flatMap(p => p[0].match(/[\\u4e00-\\u9fff々]/g) ?? [])))]`, ctx);
+if (noYomi.length) { failed++; console.log('데이터 오류: 읽기(q/jp-yomi.js)가 없는 한자', noYomi.join(' ')); }
 console.log('전 문항 풀어 보기:', vm.runInContext('res.length', ctx), '문항 기록, 데이터 오류', failed);
 
 // 직접 실행 예시를 서버에서 실제로 돌려 본다.

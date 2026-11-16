@@ -25,8 +25,8 @@ async function login() {
 function jaNav() {
   const nav = el('div', null, 'jnav');
   const btn = (label, fn) => { const b = el('button', label); b.onclick = fn; nav.append(b); };
-  btn('내 단어장', () => needLogin(words));
-  btn('성장 기록', () => needLogin(stats));
+  btn('내 단어장', () => go('words'));
+  btn('성장 기록', () => go('stats'));
   nav.append(el('span', loggedIn ? '기록 중: 푼 문제가 저장됩니다' : '로그인하면 푼 문제와 단어장이 저장돼요', 'meta'));
   if (!loggedIn) btn('로그인', async () => { if (await login()) home(); });
   return nav;
@@ -43,7 +43,7 @@ function pageHead(title) {
   app.replaceChildren();
   scrollTo(0, 0);
   const back = el('button', '← 문제 고르기', 'back plain');
-  back.onclick = home;
+  back.onclick = () => go('');
   app.append(back, el('h1', title, 'title'));
 }
 
@@ -73,6 +73,40 @@ function speak(text, rate = 1) {
   if (v) u.voice = v;
   s.speak(u);
   return true;
+}
+
+// 한자 위에 읽기(후리가나, q/jp-yomi.js)를 달고, 예문 칸(pre)의 일본어 줄 앞에 🔊 버튼을 붙인다.
+// 여러 번 불러도 된다: 이미 단 곳(ruby, .spk)은 건너뛴다.
+function furi(root) {
+  for (const pre of root.querySelectorAll('pre:not(.spk)')) {
+    pre.classList.add('spk');
+    const lines = pre.textContent.split('\n');
+    pre.replaceChildren();
+    lines.forEach((line, n) => {
+      // 「→ 뜻」과 (읽기·로마자)를 뗀 앞부분이 일본어로만 되어 있으면 읽어 줄 문장이다
+      const ja = line.split('→')[0].replace(/[(（][^)）]*[)）]/g, '').trim();
+      if (/[\u3040-\u30ff\u4e00-\u9fff]/.test(ja) && !/[\uac00-\ud7a3]/.test(ja)) {
+        const b = el('button', '🔊', 'say-line');
+        b.title = '읽어 주기';
+        b.onclick = () => speak(ja);
+        pre.append(b);
+      }
+      pre.append(line + (n < lines.length - 1 ? '\n' : ''));
+    });
+  }
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const found = [];
+  for (let t; (t = walker.nextNode());) if (KANJI.test(t.data) && !t.parentElement.closest('ruby, textarea')) found.push(t);
+  for (const t of found) {
+    const f = document.createDocumentFragment();
+    for (const [text, yomi] of yomiParts(t.data)) {
+      if (!yomi) { f.append(text); continue; }
+      const r = el('ruby', text);
+      r.append(el('rt', yomi));
+      f.append(r);
+    }
+    t.replaceWith(f);
+  }
 }
 
 function listenBox(x) {
@@ -217,7 +251,7 @@ async function stats() {
     const ul = el('ul');
     s.weak.forEach(w => { const x = Q.find(q => q.id === w.qid); if (x) ul.append(el('li', `${w.wrong}번 틀림 · ${x.t} · ${x.q}`)); });
     const again = el('button', '이 문제들 다시 풀기', 'next');
-    again.onclick = () => { list = weak; i = 0; res.length = hinted.length = 0; show(); };
+    again.onclick = () => go(new URLSearchParams({ ids: weak.map(x => x.id).join(',') }).toString());
     app.append(ul, again);
   }
 

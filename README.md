@@ -63,7 +63,7 @@ SQL은 실행할 때마다 `QuizScratch` 라는 연습용 DB를 새로 만들어
 |---|---|
 | `Program.cs` | 서버. 화면 제공 + 코드 실행 API (`/run/sql`, `/run/cs`, `/run/js`, `/run/ts`, `/run/rust`) |
 | `wwwroot/index.html` | MSSQL · C# · Blazor 문제 |
-| `wwwroot/q/*.js` | 나머지 종류의 문제 (`jp*.js` 는 `/ja` 일본어 학습지) |
+| `wwwroot/q/*.js` | 나머지 종류의 문제 (`jp*.js` 는 `/ja` 일본어 학습지, `jp-yomi.js` 는 한자 읽기(후리가나) — 새 한자를 넣으면 `check.mjs` 가 빠진 읽기를 알려 준다) |
 | `wwwroot/app.js` | 화면 동작, "직접 실행" 설정 |
 | `wwwroot/style.css` | 디자인 |
 | `check.mjs` | 점검: 문제 데이터 확인 + 실행 예시를 서버에서 전부 돌려 보기 (`node check.mjs`) |
