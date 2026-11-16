@@ -14,14 +14,15 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY quiz.csproj ./
 RUN dotnet restore
-COPY Program.cs ./
+COPY *.cs ./
 COPY wwwroot ./wwwroot
 RUN dotnet publish -c Release -o /app/out --no-restore
 
 # 관리자 권한 없이 실행한다.
-RUN useradd --create-home quiz
+# 학습 기록 DB(/data/learn.db)는 볼륨에 둔다. 다시 빌드해도 남는다.
+RUN useradd --create-home quiz && mkdir /data && chown quiz /data
 USER quiz
-ENV DOTNET_NOLOGO=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 QUIZ_URL=http://0.0.0.0:5080
+ENV DOTNET_NOLOGO=1 DOTNET_CLI_TELEMETRY_OPTOUT=1 QUIZ_URL=http://0.0.0.0:5080 QUIZ_DATA=/data
 
 # C# 한 파일 실행을 미리 한 번 돌려 둔다. 그래야 인터넷이 막힌 상태에서도 바로 실행된다.
 RUN mkdir /tmp/warm && cd /tmp/warm && echo 'Console.WriteLine("ready");' > Snippet.cs \

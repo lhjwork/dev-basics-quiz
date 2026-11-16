@@ -234,3 +234,29 @@ li { margin: 4px 0; }
 @media (prefers-reduced-motion: reduce) {
   .choice .num::after { animation: none; }
 }
+
+/* 일본어 학습지(/ja): 메뉴, 듣기, 단어장, 성장 기록 */
+.jnav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 6px 0 4px; }
+.jnav button, .mini { padding: 6px 14px; border: 1px solid var(--ink); background: none; font-size: 14px; }
+.jnav button:hover, .mini:hover:not(:disabled) { background: var(--hl-soft); }
+.mini { padding: 3px 10px; font-size: 13px; }
+.back.plain { display: block; margin-bottom: 14px; border: 1.5px solid var(--ink); }
+.listen { border-color: var(--ink); }
+.listen > b { color: var(--ink); }
+.wrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding: 8px 0; border-bottom: 1px solid var(--grid); }
+.wrow b { font-size: 18px; }
+.wform { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.wform input { flex: 1 1 8em; min-width: 0; padding: 8px 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); font: inherit; }
+.wform button { padding: 8px 18px; border: 0; background: var(--ink); color: var(--paper); font-weight: 700; }
+.card { margin: 10px 0 24px; padding: 18px 20px; border: 1.5px solid var(--ink); }
+.cword { margin: 10px 0; font-size: 34px; font-weight: 700; }
+.cback { font-size: 18px; }
+.bars { display: grid; grid-template-columns: max-content minmax(60px, 1fr) max-content; gap: 6px 12px; align-items: center; margin: 8px 0 20px; }
+.bars .bl { font-size: 14px; }
+.bar-track { height: 12px; background: var(--hl-soft); }
+.bar-fill { display: block; height: 100%; background: var(--ink); }
+.tips li { margin: 4px 0; }
+@media (max-width: 560px) {
+  .bars { grid-template-columns: 1fr; gap: 2px; }
+  .bars .bl { margin-top: 8px; }
+}

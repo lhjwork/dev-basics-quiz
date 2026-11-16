@@ -36,8 +36,8 @@ app.Use(async (ctx, next) =>
         ctx.Response.StatusCode = 403;
         return;
     }
-    // ② 화면과 문제는 누구나 본다. 코드 실행(/run)만 비밀번호를 요구한다(브라우저 기본 로그인 창).
-    if (ctx.Request.Path.StartsWithSegments("/run")
+    // ② 화면과 문제는 누구나 본다. 코드 실행(/run)과 내 학습 기록(/api)만 비밀번호를 요구한다(브라우저 기본 로그인 창).
+    if ((ctx.Request.Path.StartsWithSegments("/run") || ctx.Request.Path.StartsWithSegments("/api"))
         && !string.IsNullOrEmpty(password) && !HasPassword(ctx.Request.Headers.Authorization.ToString(), password))
     {
         // ponytail: 틀리면 1초 늦게 답할 뿐 잠금은 없다. 무차별 대입이 걱정되면 앞단(프록시)에서 횟수 제한을 건다.
@@ -69,6 +69,7 @@ var gate = new SemaphoreSlim(1, 1);
 app.MapGet("/ja", (HttpContext ctx) => ctx.Request.Path.Value!.EndsWith('/')
     ? Results.Redirect("/ja")
     : Results.File(Path.Combine(app.Environment.WebRootPath, "index.html"), "text/html; charset=utf-8"));
+app.MapLearn();
 app.MapPost("/run/sql", (RunRequest req) => Locked(() => RunSql(req)));
 app.MapPost("/run/{lang}", (string lang, RunRequest req) => Locked(() => RunCode(lang, req.Code)));
 app.Run();

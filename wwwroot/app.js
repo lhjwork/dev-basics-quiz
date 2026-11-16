@@ -141,7 +141,8 @@ const runOf = x => x.run ?? RUN[x.id];
 console.assert(new Set(Q.map(x => x.id)).size === Q.length, '문제 id 중복');
 Q.forEach(x => console.assert(
   x.c.length === 4 && x.a >= 0 && x.a < 4 && conceptOf(x)
-  && wrongOf(x)?.length === 4 && wrongOf(x).every((w, n) => (w === null) === (n === x.a)),
+  && wrongOf(x)?.length === 4 && wrongOf(x).every((w, n) => (w === null) === (n === x.a))
+  && (!isJa(x) || (['글자', '문법', '어휘', '빈칸', '듣기', '읽기'].includes(x.kind) && (x.kind === '듣기') === !!x.say)),
   '문제 데이터 오류: ' + x.id));
 
 const app = document.getElementById('app');
@@ -159,7 +160,7 @@ const el = (tag, text, cls) => {
 
 // 주소가 /ja 면 일본어 학습지, 아니면 개발 기초 학습지. 두 쪽 문제는 섞지 않는다.
 const JA = /\/ja\/?$/.test(globalThis.location?.pathname ?? '');
-const POOL = Q.filter(x => (x.t === '일본어 기초') === JA);
+const POOL = Q.filter(x => isJa(x) === JA);
 document.title = JA ? '일본어 학습지' : '기초 학습지';
 
 function home() {
@@ -184,7 +185,9 @@ function home() {
   box.checked = learning;
   box.onchange = () => { learning = box.checked; };
   label.append(box, ' 학습 모드: 문제마다 개념 설명을 펼쳐 놓고 풀기 (끄면 개념을 접어 두고 실력을 확인하는 진단 모드)');
-  app.append(label, grid);
+  app.append(label);
+  if (JA) app.append(jaNav());
+  app.append(grid);
 }
 
 function show() {
@@ -212,6 +215,7 @@ function show() {
   stem.append(el('span', `${i + 1}.`, 'qno'), x.q);
   app.append(stem);
   if (x.code) app.append(el('pre', x.code));
+  if (x.say) app.append(listenBox(x));
 
   const [kText, kCode] = conceptOf(x);
   const concept = el('details', null, 'concept');
@@ -248,6 +252,7 @@ function show() {
     }
     app.append(el('h3', '정답 해설'), el('div', x.ex, 'ex'));
     if (x.exCode) app.append(el('pre', x.exCode));
+    if (isJa(x)) app.append(jaAfter(x, res[i]));
     const others = el('details');
     others.append(el('summary', wrong ? '나머지 오답 보기는 왜 넣었을까' : '오답 보기는 왜 넣었을까'));
     order.filter(m => m !== x.a && m !== n).forEach(m => others.append(el('div', why(m), 'ex')));
