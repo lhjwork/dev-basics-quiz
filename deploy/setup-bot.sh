@@ -29,7 +29,7 @@ sudo -iu "$BOT" bash -s <<BOTEOF
 set -euo pipefail
 command -v claude >/dev/null || [ -x ~/.local/bin/claude ] || curl -fsSL https://claude.ai/install.sh | bash
 [ -x ~/.bun/bin/bun ] || curl -fsSL https://bun.sh/install | bash
-grep -q '.local/bin' ~/.profile || echo 'export PATH="\$HOME/.local/bin:\$HOME/.bun/bin:\$PATH"' >> ~/.profile
+grep -q '.bun/bin' ~/.profile || echo 'export PATH="\$HOME/.local/bin:\$HOME/.bun/bin:\$PATH"' >> ~/.profile
 [ -f ~/.ssh/id_ed25519 ] || ssh-keygen -q -t ed25519 -N '' -C quizbot -f ~/.ssh/id_ed25519
 ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
 [ -d ~/quiz ] || git clone -q https://github.com/$REPO.git ~/quiz
