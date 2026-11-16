@@ -287,7 +287,7 @@ function runBox(x, idx) {
     if (code.trim()) hinted[idx] = true;
     out.replaceChildren(el('p', isSql ? '실행 중…' : '실행 중… (처음 실행은 몇 초 걸려요)', 'meta'));
     try {
-      const r = await fetch('/run/' + spec.lang, {
+      const r = await fetch('run/' + spec.lang, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ setup: spec.setup || null, code }),

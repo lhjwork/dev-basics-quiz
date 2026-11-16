@@ -1,21 +1,48 @@
 // 학습지 서버: 화면(wwwroot) + 코드 실행 API(/run/sql, /run/cs|js|ts|rust).
 using System.Diagnostics;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 
-const string Url = "http://localhost:5080";
+// 설정(환경 변수). 아무것도 주지 않으면 내 컴퓨터에서만 쓰는 상태다.
+//   QUIZ_URL            서버가 듣는 주소                      (기본 http://localhost:5080)
+//   QUIZ_PUBLIC_ORIGIN  밖에서 접속하는 주소                  (예: https://quiz.example.com)
+//   QUIZ_PASSWORD       접속 비밀번호. 밖에 공개할 때는 필수
+//   QUIZ_SQL_HOST       MSSQL 주소                           (기본 localhost,1433)
+//   QUIZ_SQL_PASSWORD   MSSQL sa 비밀번호
+const string LocalUrl = "http://localhost:5080";
+var listenUrl = Environment.GetEnvironmentVariable("QUIZ_URL") ?? LocalUrl;
+var publicOrigin = Environment.GetEnvironmentVariable("QUIZ_PUBLIC_ORIGIN")?.TrimEnd('/');
+var password = Environment.GetEnvironmentVariable("QUIZ_PASSWORD");
+var publicHost = publicOrigin is null ? null : new Uri(publicOrigin).Host;
+
+// 이 서버는 받은 코드를 그대로 실행한다. 비밀번호 없이 밖에 열리는 일은 없어야 한다.
+if ((publicOrigin is not null || listenUrl != LocalUrl) && string.IsNullOrEmpty(password))
+    throw new InvalidOperationException("localhost 밖에서 접속하게 하려면 QUIZ_PASSWORD를 반드시 설정해야 합니다.");
+
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls(Url);
+builder.WebHost.UseUrls(listenUrl);
 var app = builder.Build();
 
-// 받은 코드를 그대로 실행하는 서버라서, 이 PC의 이 페이지에서 보낸 요청만 받는다.
 app.Use(async (ctx, next) =>
 {
+    // ① 이 서버의 화면에서 보낸 요청만 받는다(다른 사이트가 몰래 보내는 요청 차단).
+    var host = ctx.Request.Host.Host;
     var origin = ctx.Request.Headers.Origin.ToString();
-    if (ctx.Request.Host.Host != "localhost" || (origin != "" && origin != Url))
+    if ((host != "localhost" && host != publicHost) || (origin != "" && origin != LocalUrl && origin != publicOrigin))
     {
         ctx.Response.StatusCode = 403;
+        return;
+    }
+    // ② 비밀번호가 설정돼 있으면 모든 요청에 로그인을 요구한다(브라우저 기본 로그인 창).
+    if (!string.IsNullOrEmpty(password) && !HasPassword(ctx.Request.Headers.Authorization.ToString(), password))
+    {
+        // ponytail: 틀리면 1초 늦게 답할 뿐 잠금은 없다. 무차별 대입이 걱정되면 앞단(프록시)에서 횟수 제한을 건다.
+        await Task.Delay(1000);
+        ctx.Response.StatusCode = 401;
+        ctx.Response.Headers.WWWAuthenticate = "Basic realm=\"quiz\", charset=\"UTF-8\"";
         return;
     }
     await next();
@@ -25,7 +52,7 @@ app.UseStaticFiles();
 
 var connStr = new SqlConnectionStringBuilder
 {
-    DataSource = "localhost,1433",
+    DataSource = Environment.GetEnvironmentVariable("QUIZ_SQL_HOST") ?? "localhost,1433",
     UserID = "sa",
     Password = Environment.GetEnvironmentVariable("QUIZ_SQL_PASSWORD"),
     TrustServerCertificate = true,
@@ -38,6 +65,22 @@ var gate = new SemaphoreSlim(1, 1);
 app.MapPost("/run/sql", (RunRequest req) => Locked(() => RunSql(req)));
 app.MapPost("/run/{lang}", (string lang, RunRequest req) => Locked(() => RunCode(lang, req.Code)));
 app.Run();
+
+// "Authorization: Basic base64(아이디:비밀번호)" 에서 비밀번호만 확인한다. 아이디는 아무거나 된다.
+static bool HasPassword(string header, string expected)
+{
+    if (!header.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase)) return false;
+    try
+    {
+        var pair = Encoding.UTF8.GetString(Convert.FromBase64String(header[6..]));
+        var given = Encoding.UTF8.GetBytes(pair[(pair.IndexOf(':') + 1)..]);
+        return CryptographicOperations.FixedTimeEquals(given, Encoding.UTF8.GetBytes(expected));
+    }
+    catch (FormatException)
+    {
+        return false;
+    }
+}
 
 async Task<object> Locked(Func<Task<object>> run)
 {
@@ -155,6 +198,8 @@ async Task<object> RunCode(string lang, string code)
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
+        psi.Environment.Remove("QUIZ_PASSWORD");       // 실행되는 코드에 비밀 값을 넘기지 않는다
+        psi.Environment.Remove("QUIZ_SQL_PASSWORD");
         psi.Environment["DOTNET_NOLOGO"] = "1";
         psi.Environment["DOTNET_CLI_UI_LANGUAGE"] = "en";
         using var process = Process.Start(psi)!;
