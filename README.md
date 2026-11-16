@@ -46,6 +46,13 @@ docker run -d --name mssql --platform linux/amd64 \
 
 SQL은 실행할 때마다 `QuizScratch` 라는 연습용 DB를 새로 만들어 그 안에서 돌립니다.
 
+## 텔레그램 봇과 자동 배포 (서버)
+
+서버에서 한 번 `sudo deploy/setup-bot.sh` 를 실행하고, 끝에 나오는 안내를 따릅니다.
+
+- **자동 배포**: 서버가 1분마다 GitHub 를 확인해, 새 커밋이 있으면 받아서 다시 빌드합니다(`deploy/auto-deploy.sh`, 기록은 `deploy/auto-deploy.log`). 빌드가 실패하면 기존 버전이 그대로 돕니다.
+- **텔레그램 봇**: 전용 계정 `quizbot` 에서 Claude Code(Opus)가 텔레그램과 연결돼 돕니다(`bot.sh`, 규칙은 `CLAUDE.md`). "MSSQL 문제 내 줘"로 문제를 풀거나 문제 추가를 시키면, 봇이 고쳐서 GitHub 에 올리고 자동 배포가 사이트에 반영합니다. 이 계정에는 sudo·docker 권한이 없습니다.
+
 ## 구조
 
 | 파일 | 내용 |
