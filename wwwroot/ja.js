@@ -48,6 +48,20 @@ function pageHead(title) {
 }
 
 // ── 듣기: 브라우저에 들어 있는 일본어 음성으로 읽는다 ──
+// 기기에 깔린 일본어 음성 중 가장 자연스러운 것을 고른다.
+// 엣지의 Natural(Nanami 등) > 애플 프리미엄/고품질(Kyoko, O-Ren) > 구글 日本語 > 나머지. 로봇 같은 eloquence 음성은 맨 뒤.
+const VOICE_RANK = [/natural|online|neural/i, /premium/i, /enhanced|고품질|拡張/i, /google/i, /kyoko|o-?ren|nanami|hattori/i];
+function bestVoice(voices) {
+  const score = v => {
+    const id = v.name + ' ' + v.voiceURI;
+    if (/eloquence|compact/i.test(id)) return 99;
+    const i = VOICE_RANK.findIndex(r => r.test(id));
+    return i < 0 ? VOICE_RANK.length : i;
+  };
+  return voices.filter(v => v.lang.replace('_', '-').startsWith('ja')).sort((a, b) => score(a) - score(b))[0];
+}
+globalThis.speechSynthesis?.getVoices();   // 크롬은 음성 목록을 늦게 불러오므로 미리 깨워 둔다
+
 function speak(text, rate = 1) {
   const s = globalThis.speechSynthesis;
   if (!s) return false;
@@ -55,7 +69,7 @@ function speak(text, rate = 1) {
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'ja-JP';
   u.rate = rate;
-  const v = s.getVoices().find(v => v.lang.replace('_', '-').startsWith('ja'));
+  const v = bestVoice(s.getVoices());
   if (v) u.voice = v;
   s.speak(u);
   return true;
