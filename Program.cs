@@ -36,8 +36,9 @@ app.Use(async (ctx, next) =>
         ctx.Response.StatusCode = 403;
         return;
     }
-    // ② 비밀번호가 설정돼 있으면 모든 요청에 로그인을 요구한다(브라우저 기본 로그인 창).
-    if (!string.IsNullOrEmpty(password) && !HasPassword(ctx.Request.Headers.Authorization.ToString(), password))
+    // ② 화면과 문제는 누구나 본다. 코드 실행(/run)만 비밀번호를 요구한다(브라우저 기본 로그인 창).
+    if (ctx.Request.Path.StartsWithSegments("/run")
+        && !string.IsNullOrEmpty(password) && !HasPassword(ctx.Request.Headers.Authorization.ToString(), password))
     {
         // ponytail: 틀리면 1초 늦게 답할 뿐 잠금은 없다. 무차별 대입이 걱정되면 앞단(프록시)에서 횟수 제한을 건다.
         await Task.Delay(1000);
@@ -63,6 +64,11 @@ var connStr = new SqlConnectionStringBuilder
 // ponytail: 한 번에 하나만 실행한다(연습용 DB와 임시 파일을 같이 쓴다). 여러 명이 쓰게 되면 실행마다 DB를 따로 만든다.
 var gate = new SemaphoreSlim(1, 1);
 
+// 일본어 학습지: 같은 화면을 열고 app.js 가 주소(/ja)를 보고 일본어 문제만 보여 준다.
+// /ja/ 로 오면 q/*.js 같은 상대 경로가 /ja/q/ 로 풀리므로 /ja 로 보낸다.
+app.MapGet("/ja", (HttpContext ctx) => ctx.Request.Path.Value!.EndsWith('/')
+    ? Results.Redirect("/ja")
+    : Results.File(Path.Combine(app.Environment.WebRootPath, "index.html"), "text/html; charset=utf-8"));
 app.MapPost("/run/sql", (RunRequest req) => Locked(() => RunSql(req)));
 app.MapPost("/run/{lang}", (string lang, RunRequest req) => Locked(() => RunCode(lang, req.Code)));
 app.Run();

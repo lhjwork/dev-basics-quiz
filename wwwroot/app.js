@@ -157,10 +157,16 @@ const el = (tag, text, cls) => {
   return e;
 };
 
+// 주소가 /ja 면 일본어 학습지, 아니면 개발 기초 학습지. 두 쪽 문제는 섞지 않는다.
+const JA = /\/ja\/?$/.test(globalThis.location?.pathname ?? '');
+const POOL = Q.filter(x => (x.t === '일본어 기초') === JA);
+document.title = JA ? '일본어 학습지' : '기초 학습지';
+
 function home() {
   app.replaceChildren(
-    el('h1', '기초 학습지', 'title'),
-    el('p', '종류를 골라서 풀어 보세요. 문제마다 개념을 먼저 읽고, 코드를 직접 쳐서 실행해 볼 수 있어요.', 'lead'));
+    el('h1', document.title, 'title'),
+    el('p', JA ? '종류를 골라서 풀어 보세요. 문제마다 개념과 예문을 먼저 읽고 풀어요.'
+               : '종류를 골라서 풀어 보세요. 문제마다 개념을 먼저 읽고, 코드를 직접 쳐서 실행해 볼 수 있어요.', 'lead'));
   const grid = el('div', null, 'home');
   const add = (label, qs) => {
     const b = el('button', null, 'topic');
@@ -168,8 +174,8 @@ function home() {
     b.onclick = () => { list = qs; i = 0; res.length = hinted.length = 0; show(); };
     grid.append(b);
   };
-  for (const t of new Set(Q.map(x => x.t))) add(t, Q.filter(x => x.t === t));
-  add('전체', Q);
+  for (const t of new Set(POOL.map(x => x.t))) add(t, POOL.filter(x => x.t === t));
+  add('전체', POOL);
 
   // 학습 모드(기본): 개념을 펼쳐 놓고 배우면서 푼다. 끄면 개념을 접어 두고 실력을 확인한다.
   const label = el('label', null, 'mode');
