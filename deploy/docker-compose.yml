@@ -1,5 +1,7 @@
-# 서버 배포 구성: HTTPS(caddy) → 학습지(quiz) → 전용 MSSQL(mssql)
-# 사용: 이 폴더에 .env 를 만들고(.env.example 참고)  docker compose up -d --build
+# 서버 배포 구성: HTTPS(caddy) → 학습지(quiz) [→ 전용 MSSQL(mssql)]
+# 사용: 이 폴더에 .env 를 만들고(.env.example 참고)
+#   메모리 4GB 미만 서버:  docker compose up -d --build                 (SQL 실행 꺼짐)
+#   메모리 4GB 이상 서버:  docker compose --profile sql up -d --build   (.env 에 QUIZ_SQL_HOST=mssql,1433)
 services:
   # 밖에서 들어오는 유일한 입구. 인증서를 자동으로 발급받아 HTTPS로 받는다.
   caddy:
@@ -21,25 +23,26 @@ services:
     environment:
       QUIZ_PUBLIC_ORIGIN: https://${QUIZ_DOMAIN:?}
       QUIZ_PASSWORD: ${QUIZ_PASSWORD:?}
-      QUIZ_SQL_HOST: mssql,1433
-      QUIZ_SQL_PASSWORD: ${MSSQL_SA_PASSWORD:?}
+      QUIZ_SQL_HOST: ${QUIZ_SQL_HOST:-off}
+      QUIZ_SQL_PASSWORD: ${MSSQL_SA_PASSWORD:-}
     networks: [inner]
-    mem_limit: 1500m
+    mem_limit: ${QUIZ_MEMORY:-1g}
+    memswap_limit: 2g
     cpus: 1.5
     pids_limit: 300
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
-    depends_on: [mssql]
 
-  # 학습지 전용 DB. 다른 데이터는 넣지 않는다.
+  # 학습지 전용 DB. MSSQL은 메모리 2GB 이상인 서버에서만 시작된다. 다른 데이터는 넣지 않는다.
   mssql:
+    profiles: [sql]
     image: mcr.microsoft.com/mssql/server:2022-latest
     restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_PID: Express
       MSSQL_MEMORY_LIMIT_MB: "1024"
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-}
     networks: [inner]
     mem_limit: 2g
 

@@ -10,7 +10,7 @@ using Microsoft.Data.SqlClient;
 //   QUIZ_URL            서버가 듣는 주소                      (기본 http://localhost:5080)
 //   QUIZ_PUBLIC_ORIGIN  밖에서 접속하는 주소                  (예: https://quiz.example.com)
 //   QUIZ_PASSWORD       접속 비밀번호. 밖에 공개할 때는 필수
-//   QUIZ_SQL_HOST       MSSQL 주소                           (기본 localhost,1433)
+//   QUIZ_SQL_HOST       MSSQL 주소. off 면 SQL 실행을 끈다    (기본 localhost,1433)
 //   QUIZ_SQL_PASSWORD   MSSQL sa 비밀번호
 const string LocalUrl = "http://localhost:5080";
 var listenUrl = Environment.GetEnvironmentVariable("QUIZ_URL") ?? LocalUrl;
@@ -50,11 +50,12 @@ app.Use(async (ctx, next) =>
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+var sqlHost = Environment.GetEnvironmentVariable("QUIZ_SQL_HOST") ?? "localhost,1433";
 var connStr = new SqlConnectionStringBuilder
 {
-    DataSource = Environment.GetEnvironmentVariable("QUIZ_SQL_HOST") ?? "localhost,1433",
+    DataSource = sqlHost == "off" ? "localhost" : sqlHost,
     UserID = "sa",
-    Password = Environment.GetEnvironmentVariable("QUIZ_SQL_PASSWORD"),
+    Password = Environment.GetEnvironmentVariable("QUIZ_SQL_PASSWORD") ?? "",
     TrustServerCertificate = true,
     Pooling = false,
 }.ConnectionString;
@@ -94,6 +95,11 @@ async Task<object> RunSql(RunRequest req)
 {
     var output = new List<object>();   // 실행 결과: 표, 메시지, 에러가 나온 순서대로
     var tables = new List<object>();   // 실행이 끝난 뒤 각 테이블의 내용
+    if (sqlHost == "off")   // MSSQL을 띄울 수 없는 작은 서버용
+    {
+        output.Add(new { type = "error", text = "이 서버에는 MSSQL이 없어서 SQL 실행을 꺼 두었어요. 내 컴퓨터에서 run.sh 로 켠 학습지에서는 실행됩니다." });
+        return new { output, tables };
+    }
     try
     {
         await using var conn = new SqlConnection(connStr);
