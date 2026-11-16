@@ -54,8 +54,10 @@ const YOMI = {
 
 // 글을 [글자, 읽기?] 조각으로 나눈다. 바로 뒤에 (읽기)를 이미 적어 둔 한자는 읽기를 달지 않는다.
 const KANJI = /[一-鿿々]/;
-const YOMI_MAX = Math.max(...Object.keys(YOMI).map(k => k.length));
+// 다른 파일(q/jp-*.js)이 Object.assign(YOMI, {...}) 로 읽기를 보탠다. 그래서 가장 긴 열쇠 길이는 처음 쓸 때 잰다.
+let YOMI_MAX = 0;
 function yomiParts(text) {
+  YOMI_MAX ||= Math.max(...Object.keys(YOMI).map(k => k.length));
   const out = [];
   let plain = '';
   for (let p = 0; p < text.length;) {
@@ -63,7 +65,7 @@ function yomiParts(text) {
     if (KANJI.test(text[p])) for (let n = Math.min(YOMI_MAX, text.length - p); n > 0 && !key; n--) if (YOMI[text.substr(p, n)]) key = text.substr(p, n);
     if (!key) { plain += text[p++]; continue; }
     const kan = key.match(/^[一-鿿々]+/)[0];
-    const already = /^[(（]/.test(text[p + kan.length] ?? '');
+    const already = /^[(（][ぁ-ゖァ-ヺ]/.test(text.substr(p + kan.length, 2));   // 빈칸 （　） 앞의 한자는 읽기를 단다
     if (plain) out.push([plain]);
     plain = '';
     out.push([kan, already ? '' : YOMI[key]]);   // 읽기가 '' 이면 이미 적혀 있어서 달지 않는 것

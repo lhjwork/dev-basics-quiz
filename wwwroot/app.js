@@ -142,7 +142,8 @@ console.assert(new Set(Q.map(x => x.id)).size === Q.length, '문제 id 중복');
 Q.forEach(x => console.assert(
   x.c.length === 4 && x.a >= 0 && x.a < 4 && conceptOf(x)
   && wrongOf(x)?.length === 4 && wrongOf(x).every((w, n) => (w === null) === (n === x.a))
-  && (!isJa(x) || (['글자', '문법', '어휘', '빈칸', '듣기', '읽기'].includes(x.kind) && (x.kind === '듣기') === !!x.say)),
+  && (!isJa(x) || (['글자', '문법', '어휘', '빈칸', '듣기', '읽기'].includes(x.kind) && (x.kind === '듣기') === !!x.say))
+  && (!isGk(x) || !!x.kind),
   '문제 데이터 오류: ' + x.id));
 
 const app = document.getElementById('app');
@@ -158,10 +159,14 @@ const el = (tag, text, cls) => {
   return e;
 };
 
-// 주소가 /ja 면 일본어 학습지, 아니면 개발 기초 학습지. 두 쪽 문제는 섞지 않는다.
-const JA = /\/ja\/?$/.test(globalThis.location?.pathname ?? '');
-const POOL = Q.filter(x => isJa(x) === JA);
-document.title = JA ? '일본어 학습지' : '기초 학습지';
+// 주소로 학습지를 나눈다: / 개발, /ja 일본어, /common 상식. 서로 문제를 섞지 않는다.
+const SECTIONS = [['개발', '/', '기초 학습지'], ['일본어', '/ja', '일본어 학습지'], ['상식', '/common', '상식 학습지']];
+const secOf = x => isJa(x) ? '/ja' : isGk(x) ? '/common' : '/';
+const SEC = SECTIONS.find(([, href]) => href !== '/' && (globalThis.location?.pathname ?? '').replace(/\/$/, '') === href)?.[1] ?? '/';
+const JA = SEC === '/ja';
+const SAVED = SEC !== '/';   // 일본어·상식은 로그인하면 푼 기록을 서버에 남긴다
+const POOL = Q.filter(x => secOf(x) === SEC);
+document.title = SECTIONS.find(s => s[1] === SEC)[2];
 
 // 화면마다 주소(#t=종류&n=번호, #words, #stats)를 둬서 브라우저 뒤로 가기가 앞 화면으로 돌아오게 한다.
 let listKey = null;   // 지금 푸는 묶음(같은 묶음 안에서 오가면 채점 기록을 유지한다)
@@ -170,7 +175,7 @@ function goAt(n) { const p = new URLSearchParams(location.hash.slice(1)); p.set(
 function route() {
   const p = new URLSearchParams(location.hash.slice(1));
   if (JA && p.has('words')) return needLogin(words);
-  if (JA && p.has('stats')) return needLogin(stats);
+  if (SAVED && p.has('stats')) return needLogin(stats);
   const t = p.get('t'), ids = p.get('ids');
   const qs = ids ? ids.split(',').map(id => POOL.find(x => x.id === id)).filter(Boolean)
     : t === '전체' ? POOL : POOL.filter(x => x.t === t);
@@ -187,15 +192,15 @@ function home() {
   scrollTo(0, 0);
   // 개발 / 일본어 학습지는 주소로 나뉜다. 맨 위에서 오간다.
   const tabs = el('nav', null, 'tabs');
-  [['개발', '/'], ['일본어', '/ja']].forEach(([label, href]) => {
-    const a = el('a', label, (href === '/ja') === JA ? 'on' : '');
+  SECTIONS.forEach(([label, href]) => {
+    const a = el('a', label, href === SEC ? 'on' : '');
     a.href = href;
     tabs.append(a);
   });
   app.replaceChildren(
     tabs,
     el('h1', document.title, 'title'),
-    el('p', JA ? '종류를 골라서 풀어 보세요. 문제마다 개념과 예문을 먼저 읽고 풀어요.'
+    el('p', SAVED ? '종류를 골라서 풀어 보세요. 문제마다 개념과 예문을 먼저 읽고 풀어요.'
                : '종류를 골라서 풀어 보세요. 문제마다 개념을 먼저 읽고, 코드를 직접 쳐서 실행해 볼 수 있어요.', 'lead'));
   const grid = el('div', null, 'home');
   const add = (label, qs) => {
@@ -215,7 +220,7 @@ function home() {
   box.onchange = () => { learning = box.checked; };
   label.append(box, ' 학습 모드: 문제마다 개념 설명을 펼쳐 놓고 풀기 (끄면 개념을 접어 두고 실력을 확인하는 진단 모드)');
   app.append(label);
-  if (JA) app.append(jaNav());
+  if (SAVED) app.append(jaNav());
   app.append(grid);
 }
 
@@ -282,7 +287,7 @@ function show() {
     }
     app.append(el('h3', '정답 해설'), el('div', x.ex, 'ex'));
     if (x.exCode) app.append(el('pre', x.exCode));
-    if (isJa(x)) app.append(jaAfter(x, res[i]));
+    if (SAVED) app.append(jaAfter(x, res[i]));
     const others = el('details');
     others.append(el('summary', wrong ? '나머지 오답 보기는 왜 넣었을까' : '오답 보기는 왜 넣었을까'));
     order.filter(m => m !== x.a && m !== n).forEach(m => others.append(el('div', why(m), 'ex')));

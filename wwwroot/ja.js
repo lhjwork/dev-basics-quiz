@@ -1,6 +1,7 @@
 // 일본어 학습지(/ja) 전용: 듣기, 학습 기록, 내 단어장, 성장 기록. 화면 공통 부분은 app.js 에 있다.
 // 기록과 단어장은 서버 DB(/api, 비밀번호 필요)에 저장한다. 로그인하지 않으면 문제만 풀 수 있다.
 const isJa = x => x.id.startsWith('JP');
+const isGk = x => x.id.startsWith('GK');   // 상식 학습지(/common). 기록·성장 기록은 일본어와 같이 쓴다(단어장은 빼고)
 const store = {
   get: k => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
@@ -25,9 +26,9 @@ async function login() {
 function jaNav() {
   const nav = el('div', null, 'jnav');
   const btn = (label, fn) => { const b = el('button', label); b.onclick = fn; nav.append(b); };
-  btn('내 단어장', () => go('words'));
+  if (JA) btn('내 단어장', () => go('words'));
   btn('성장 기록', () => go('stats'));
-  nav.append(el('span', loggedIn ? '기록 중: 푼 문제가 저장됩니다' : '로그인하면 푼 문제와 단어장이 저장돼요', 'meta'));
+  nav.append(el('span', loggedIn ? '기록 중: 푼 문제가 저장됩니다' : '로그인하면 푼 문제' + (JA ? '와 단어장이' : '가') + ' 저장돼요', 'meta'));
   if (!loggedIn) btn('로그인', async () => { if (await login()) home(); });
   return nav;
 }
@@ -214,7 +215,7 @@ function card(due, n) {
 async function stats() {
   pageHead('성장 기록');
   let s;
-  try { s = await api('stats'); } catch { return alertBox('기록을 불러오지 못했어요.'); }
+  try { s = await api('stats?p=' + (JA ? 'JP' : 'GK')); } catch { return alertBox('기록을 불러오지 못했어요.'); }
   const pct = (ok, n) => n ? Math.round(ok / n * 100) : null;
   const total = s.weeks.reduce((a, w) => a + w.n, 0);
   if (!total) {
@@ -238,7 +239,7 @@ async function stats() {
   app.append(el('h2', '최근 4주 매일 푼 문제'));
   app.append(bars(s.days.map(d => [d.day.slice(5).replace('-', '/'), pct(d.ok, d.n), `${d.n}문제`])));
 
-  app.append(el('h2', '레벨별 실력'));
+  app.append(el('h2', JA ? '레벨·종류별 실력' : '분야별 실력'));
   app.append(bars(s.topics.map(t => [t.topic, pct(t.ok, t.n), `${t.n}문제` + (t.n7 ? ` · 최근 7일 ${pct(t.ok7, t.n7)}%` : '')])));
 
   app.append(el('h2', '유형별 실력'));
@@ -256,7 +257,7 @@ async function stats() {
   }
 
   const wd = s.words;
-  app.append(el('h2', '단어장'), el('p', `전체 ${wd.total}개 · 오늘 복습 ${wd.due ?? 0}개 · 익힌 단어(4칸 이상) ${wd.learned ?? 0}개`));
+  if (JA) app.append(el('h2', '단어장'), el('p', `전체 ${wd.total}개 · 오늘 복습 ${wd.due ?? 0}개 · 익힌 단어(4칸 이상) ${wd.learned ?? 0}개`));
 }
 
 // 기록을 보고 다음에 할 일을 짧게 알려 준다.
@@ -265,14 +266,14 @@ function advice(s, pct) {
   const enough = s.topics.filter(t => t.n >= 10);
   for (const t of enough) {
     const p = pct(t.ok, t.n);
-    if (p >= 80) tips.push(`${t.topic} 정답률 ${p}% — 다음 레벨로 올라가도 좋아요.`);
+    if (p >= 80) tips.push(`${t.topic} 정답률 ${p}% — ` + (JA ? '다음 레벨로 올라가도 좋아요.' : '잘 익혔어요. 다른 분야도 풀어 보세요.'));
     else if (p < 50) tips.push(`${t.topic} 정답률 ${p}% — 개념 설명을 다시 읽고 틀린 문제부터 다시 풀어 보세요.`);
   }
   const kinds = s.kinds.filter(k => k.n >= 5).sort((a, b) => a.ok / a.n - b.ok / b.n);
   if (kinds.length > 1) tips.push(`가장 약한 유형은 「${kinds[0].kind}」(${pct(kinds[0].ok, kinds[0].n)}%)예요.`);
   const days = s.days.length;
   if (days) tips.push(`최근 4주 중 ${days}일 공부했어요.` + (days < 8 ? ' 주 2~3번 이상 꾸준히 풀면 실력이 더 빨리 늘어요.' : ''));
-  if (s.words.due) tips.push(`오늘 복습할 단어가 ${s.words.due}개 있어요.`);
+  if (JA && s.words.due) tips.push(`오늘 복습할 단어가 ${s.words.due}개 있어요.`);
   if (!tips.length) return [];
   const ul = el('ul', null, 'tips');
   tips.forEach(t => ul.append(el('li', t)));

@@ -32,31 +32,37 @@ static class Learn
 
         // 맞힌 비율은 (ok + hint) / 전체. 날짜는 한국 시간, 주는 월요일부터.
         const string Rate = "COUNT(*) AS n, SUM(result IN ('ok','hint')) AS ok";
-        app.MapGet("/api/stats", () => new
+        // p: 문제 id 앞부분(JP 일본어, GK 상식). 학습지마다 기록을 따로 본다.
+        app.MapGet("/api/stats", (string? p) =>
         {
-            weeks = Query(cs, $"""
-                SELECT date(at, '+9 hours', 'weekday 0', '-6 days') AS week, {Rate}
-                FROM answers WHERE at >= datetime('now', '-84 days') GROUP BY week ORDER BY week
-                """),
-            topics = Query(cs, $"""
-                SELECT topic, {Rate},
-                       SUM(at >= datetime('now', '-7 days')) AS n7,
-                       SUM(at >= datetime('now', '-7 days') AND result IN ('ok','hint')) AS ok7
-                FROM answers GROUP BY topic ORDER BY topic
-                """),
-            kinds = Query(cs, $"SELECT kind, {Rate} FROM answers GROUP BY kind ORDER BY n DESC"),
-            days = Query(cs, $"""
-                SELECT date(at, '+9 hours') AS day, {Rate} FROM answers
-                WHERE at >= datetime('now', '-28 days') GROUP BY day ORDER BY day
-                """),
-            weak = Query(cs, """
-                SELECT qid, topic, COUNT(*) AS wrong FROM answers
-                WHERE result IN ('bad','skip') AND at >= datetime('now', '-30 days')
-                GROUP BY qid ORDER BY wrong DESC LIMIT 10
-                """),
-            words = Query(cs, """
-                SELECT COUNT(*) AS total, SUM(due <= date('now', '+9 hours')) AS due, SUM(box >= 4) AS learned FROM words
-                """)[0],
+            var pre = ("$p", (object)((p ?? "") + "%"));
+            const string Mine = "qid LIKE $p";
+            return new
+            {
+                weeks = Query(cs, $"""
+                    SELECT date(at, '+9 hours', 'weekday 0', '-6 days') AS week, {Rate}
+                    FROM answers WHERE {Mine} AND at >= datetime('now', '-84 days') GROUP BY week ORDER BY week
+                    """, pre),
+                topics = Query(cs, $"""
+                    SELECT topic, {Rate},
+                           SUM(at >= datetime('now', '-7 days')) AS n7,
+                           SUM(at >= datetime('now', '-7 days') AND result IN ('ok','hint')) AS ok7
+                    FROM answers WHERE {Mine} GROUP BY topic ORDER BY topic
+                    """, pre),
+                kinds = Query(cs, $"SELECT kind, {Rate} FROM answers WHERE {Mine} GROUP BY kind ORDER BY n DESC", pre),
+                days = Query(cs, $"""
+                    SELECT date(at, '+9 hours') AS day, {Rate} FROM answers
+                    WHERE {Mine} AND at >= datetime('now', '-28 days') GROUP BY day ORDER BY day
+                    """, pre),
+                weak = Query(cs, $"""
+                    SELECT qid, topic, COUNT(*) AS wrong FROM answers
+                    WHERE {Mine} AND result IN ('bad','skip') AND at >= datetime('now', '-30 days')
+                    GROUP BY qid ORDER BY wrong DESC LIMIT 10
+                    """, pre),
+                words = Query(cs, """
+                    SELECT COUNT(*) AS total, SUM(due <= date('now', '+9 hours')) AS due, SUM(box >= 4) AS learned FROM words
+                    """)[0],
+            };
         });
 
         app.MapGet("/api/words", () => Query(cs, """

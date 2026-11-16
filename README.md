@@ -3,7 +3,8 @@
 개발 기초를 4지선다 문제로 익히는 학습지입니다. 문제를 풀기 전에 개념을 읽고, 코드를 직접 쳐서 실행해 실제 결과를 확인할 수 있습니다.
 
 - 개발 기초(`/`): 16개 종류, 155문제. MSSQL, C#, Blazor, JavaScript, TypeScript, Node.js, React, Next.js, Tailwind CSS, Rust, IT 면접 기초, 네트워크 기초, 설계와 아키텍처, 테스트, 보안, 성능과 동시성
-- 일본어 학습지(`/ja`): Lv1(글자)~Lv6(N1) 60문제. 글자·문법·어휘·빈칸·듣기(브라우저 음성)·읽기 (`wwwroot/q/jp*.js`, 화면은 `wwwroot/ja.js`)
+- 일본어 학습지(`/ja`): Lv1(글자)~Lv6(N1) 60문제 + 필수 동사·형용사·명사·부사·숙어·회화(요즘 표현) 239문제. 글자·문법·어휘·빈칸·듣기(브라우저 음성)·읽기 (`wwwroot/q/jp*.js`, 화면은 `wwwroot/ja.js`)
+- 상식 학습지(`/common`): 일반·IT·시사경제 상식 30문제 (`wwwroot/q/gk-*.js`, id 가 `GK` 로 시작). 기록·성장 기록은 일본어와 같은 방식이고 따로 집계한다(`/api/stats?p=GK`)
   - 로그인하면 푼 문제가 서버 DB(SQLite, `QUIZ_DATA/learn.db`)에 쌓이고, "성장 기록"에서 주별·레벨별·유형별 정답률과 자주 틀린 문제를 본다
   - "내 단어장": 문제의 단어를 담아 1→3→7→14→30→60일 간격으로 복습한다
 - 문제마다 개념 설명(코드 → 결과)과, 오답 보기마다 "왜 오답으로 넣었는지" 해설
@@ -41,7 +42,7 @@ docker run -d --name mssql --platform linux/amd64 \
 | 환경 변수 | 내용 |
 |---|---|
 | `QUIZ_PUBLIC_ORIGIN` | 밖에서 접속하는 주소. 예: `https://quiz.example.com` |
-| `QUIZ_PASSWORD` | 코드 실행(`/run`)과 학습 기록(`/api`) 비밀번호. 화면과 문제는 누구나 보고, "실행"이나 일본어 "로그인"을 누를 때만 브라우저 로그인 창이 뜬다(아이디는 아무거나) |
+| `QUIZ_PASSWORD` | 코드 실행(`/run`)과 학습 기록(`/api`) 비밀번호. 화면과 문제는 누구나 보고, "실행"이나 일본어·상식 "로그인"을 누를 때만 브라우저 로그인 창이 뜬다(아이디는 아무거나) |
 | `QUIZ_DATA` | 학습 기록 DB 폴더. 기본값 `./data`, 컨테이너는 `/data`(볼륨 `quiz_data`) |
 | `QUIZ_URL` | 서버가 듣는 주소. 기본 `http://localhost:5080` |
 | `QUIZ_SQL_HOST` | MSSQL 주소. 기본 `localhost,1433` |
@@ -63,7 +64,7 @@ SQL은 실행할 때마다 `QuizScratch` 라는 연습용 DB를 새로 만들어
 |---|---|
 | `Program.cs` | 서버. 화면 제공 + 코드 실행 API (`/run/sql`, `/run/cs`, `/run/js`, `/run/ts`, `/run/rust`) |
 | `wwwroot/index.html` | MSSQL · C# · Blazor 문제 |
-| `wwwroot/q/*.js` | 나머지 종류의 문제 (`jp*.js` 는 `/ja` 일본어 학습지, `jp-yomi.js` 는 한자 읽기(후리가나) — 새 한자를 넣으면 `check.mjs` 가 빠진 읽기를 알려 준다) |
+| `wwwroot/q/*.js` | 나머지 종류의 문제 (`jp*.js` 는 `/ja` 일본어 학습지, `gk-*.js` 는 `/common` 상식 학습지, `jp-yomi.js` 는 한자 읽기(후리가나) — 새 한자를 넣으면 `check.mjs` 가 빠진 읽기를 알려 준다) |
 | `wwwroot/app.js` | 화면 동작, "직접 실행" 설정 |
 | `wwwroot/style.css` | 디자인 |
 | `check.mjs` | 점검: 문제 데이터 확인 + 실행 예시를 서버에서 전부 돌려 보기 (`node check.mjs`) |

@@ -66,14 +66,15 @@ var connStr = new SqlConnectionStringBuilder
 // ponytail: 한 번에 하나만 실행한다(연습용 DB와 임시 파일을 같이 쓴다). 여러 명이 쓰게 되면 실행마다 DB를 따로 만든다.
 var gate = new SemaphoreSlim(1, 1);
 
-// 일본어 학습지: 같은 화면을 열고 app.js 가 주소(/ja)를 보고 일본어 문제만 보여 준다.
-// /ja/ 로 오면 q/*.js 같은 상대 경로가 /ja/q/ 로 풀리므로 /ja 로 보낸다.
-app.MapGet("/ja", (HttpContext ctx) =>
-{
-    if (ctx.Request.Path.Value!.EndsWith('/')) return Results.Redirect("/ja");
-    ctx.Response.Headers.CacheControl = "no-cache";
-    return Results.File(Path.Combine(app.Environment.WebRootPath, "index.html"), "text/html; charset=utf-8");
-});
+// 일본어(/ja)·상식(/common) 학습지: 같은 화면을 열고 app.js 가 주소를 보고 그 문제만 보여 준다.
+// /ja/ 로 오면 q/*.js 같은 상대 경로가 /ja/q/ 로 풀리므로 끝의 / 를 떼고 보낸다.
+foreach (var page in new[] { "/ja", "/common" })
+    app.MapGet(page, (HttpContext ctx) =>
+    {
+        if (ctx.Request.Path.Value!.EndsWith('/')) return Results.Redirect(page);
+        ctx.Response.Headers.CacheControl = "no-cache";
+        return Results.File(Path.Combine(app.Environment.WebRootPath, "index.html"), "text/html; charset=utf-8");
+    });
 app.MapLearn();
 app.MapPost("/run/sql", (RunRequest req) => Locked(() => RunSql(req)));
 app.MapPost("/run/{lang}", (string lang, RunRequest req) => Locked(() => RunCode(lang, req.Code)));
