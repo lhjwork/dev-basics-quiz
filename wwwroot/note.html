@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일본어 수업 노트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Nanum+Pen+Script&family=Noto+Sans+JP:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+/* 수업 노트: 학습지 종이(style.css) 위에 빨간 여백선 + 파란 볼펜(일본어) + 노란 포스트잇(내 메모) */
+#app { position: relative; padding-left: 64px; }
+#app::before { content: ""; position: absolute; top: 0; bottom: 0; left: 40px; border-left: 2px solid var(--red); opacity: .45; }
+.toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 8px; }
+.toc a { padding: 3px 10px; border: 1px solid var(--grid); border-radius: 99px; color: var(--sub); font-size: 13px; text-decoration: none; }
+.toc a:hover { background: var(--hl-soft); color: var(--ink); }
+section { margin-top: 44px; scroll-margin-top: 12px; }
+h2 { margin: 0 0 12px; font: 400 34px/1.2 var(--pen); }
+h2 span { background: linear-gradient(transparent 55%, var(--hl) 55%); }
+h2 small { margin-left: 8px; font: 12px var(--sans); color: var(--sub); border: 1px solid var(--grid); padding: 1px 7px; border-radius: 99px; vertical-align: middle; }
+h3 { margin: 22px 0 6px; font-size: 15px; font-weight: 700; }
+h3::before { content: "✎ "; color: var(--red); }
+b { font: 500 1.06em "Noto Sans JP", "Hiragino Sans", var(--sans); color: var(--blue); cursor: pointer; }
+b:hover { background: var(--hl-soft); }
+rt { font-size: .55em; color: var(--sub); }
+.wrap { overflow-x: auto; }
+table { border-collapse: collapse; margin: 6px 0; min-width: 60%; font: inherit; }
+th, td { font-family: var(--sans); }
+th, td { padding: 6px 14px 6px 0; border-bottom: 1px dashed var(--grid); text-align: left; vertical-align: top; }
+th { font-size: 13px; font-weight: 500; color: var(--sub); white-space: nowrap; }
+td i, .s i { font-style: normal; font-size: 13px; color: var(--sub); }
+ul { margin: 6px 0; padding-left: 20px; }
+.s { margin: 12px 0; padding-left: 12px; border-left: 3px solid var(--grid); }
+.s span { display: block; color: var(--sub); font-size: 14px; }
+.tip, .fix { margin: 12px 0; padding: 8px 14px; font-size: 15px; }
+.tip { background: var(--hl-soft); font: 22px/1.35 var(--pen); transform: rotate(-.4deg); box-shadow: 2px 3px 0 var(--grid); }
+.tip b { font-size: .8em; }
+.fix { border: 1px dashed var(--sub); color: var(--sub); font-size: 14px; }
+.fix::before { content: "보충 · "; font-weight: 700; }
+@media (max-width: 600px) { #app { padding-left: 20px; } #app::before { display: none; } h2 { font-size: 30px; } }
+</style>
+<div id="app">
+<nav class="tabs"><a href="/">개발</a><a href="/ja">일본어</a><a href="/common">상식</a><a class="on" href="note.html">수업 노트</a></nav>
+<h1 class="title">일본어 수업 노트</h1>
+<p class="lead">수업 때 공책에 적은 문법과 문장을 주제별로 옮겨 적었어요. 파란 글씨(일본어)를 누르면 소리로 읽어 줍니다.</p>
+<nav class="toc">
+<a href="#intro">자기소개</a><a href="#josa">조사</a><a href="#verb">동사 3그룹</a><a href="#masu">ます</a><a href="#nai">ない</a><a href="#ta">た</a><a href="#te">て</a><a href="#all">활용 한눈에</a><a href="#mae">前に·後に</a><a href="#koto">~한 적·~할 때</a><a href="#adj">くて·で</a><a href="#kedo">けど</a><a href="#tai">たいです</a><a href="#suki">が すきです</a><a href="#naru">なります</a><a href="#sou">そうだ·らしい</a><a href="#sugiru">すぎる</a><a href="#etc">표현 모음</a><a href="#write">작문</a>
+</nav>
+
+<section id="intro">
+<h2><span>자기소개</span></h2>
+<div class="wrap"><table>
+<tr><th>1</th><td>처음 뵙겠습니다.</td></tr>
+<tr><th>2</th><td>제 이름은 <b>＿＿ です</b></td></tr>
+<tr><th>3</th><td>제 출신은 <b>(나라) の (지역) です</b></td></tr>
+<tr><th>4</th><td>제 취미는 <b>＿＿ です</b></td></tr>
+<tr><th>5</th><td>잘 부탁드립니다.</td></tr>
+</table></div>
+<p class="fix">처음 뵙겠습니다 = <b>はじめまして</b> · 제 이름은 = <b>わたしの なまえは ＿＿ です</b> · 출신 = <b>しゅっしん</b> · 취미 = <b>しゅみ</b> · 잘 부탁드립니다 = <b>よろしく おねがいします</b></p>
+</section>
+
+<section id="josa">
+<h2><span>조사</span></h2>
+<p class="tip">끊어 읽기 ⇒ 조사 기준! (+ て 에서도 끊는다)</p>
+<div class="wrap"><table>
+<tr><td><b>は</b></td><td>은 / 는</td><td><b>の</b></td><td>~의</td></tr>
+<tr><td><b>が</b></td><td>이 / 가</td><td><b>も</b></td><td>~도</td></tr>
+<tr><td><b>を</b></td><td>을 / 를</td><td><b>に</b></td><td>~에, ~로(장소·방향), ~으로</td></tr>
+<tr><td><b>と</b></td><td>와 / 과 / 랑</td><td><b>で</b></td><td>① ~로(수단) ② ~에서(장소)</td></tr>
+</table></div>
+<h3>と 의 세 가지 뜻</h3>
+<ul><li>~와 / 랑 / 과</li><li>~라고</li><li>~한다면 ⇒ 동사 원형 + <b>と</b></li></ul>
+<h3>から · まで</h3>
+<div class="wrap"><table>
+<tr><td><b>から</b></td><td>① ~부터 ⇒ 명사 + から (날짜 · 시간 · 거리 · 그 외) <i>예) 오늘부터 운동</i><br>② ~ 때문에</td></tr>
+<tr><td><b>まで</b></td><td>~까지</td></tr>
+</table></div>
+</section>
+
+<section id="verb">
+<h2><span>동사 3그룹</span> <small>노짱 정리</small></h2>
+<div class="wrap"><table>
+<tr><th>1그룹</th><td>나머지 전부 ⇒ 끝 글자가 <b>う つ る</b> · <b>ぬ ぶ む</b> · <b>く ぐ す</b></td></tr>
+<tr><th>2그룹</th><td>① <b>る</b> 로 끝나고 ② る 앞이 <b>い</b>단 · <b>え</b>단</td></tr>
+<tr><th>3그룹</th><td><b>する</b> 하다 · <b>くる</b> 오다</td></tr>
+</table></div>
+</section>
+
+<section id="masu">
+<h2><span>ます</span> <small>합니다</small></h2>
+<div class="wrap"><table>
+<tr><td><b>ます</b></td><td>합니다</td><td><b>ました</b></td><td>했습니다</td></tr>
+<tr><td><b>ません</b></td><td>안 합니다</td><td><b>ませんでした</b></td><td>안 했습니다</td></tr>
+</table></div>
+<h3>만드는 법</h3>
+<div class="wrap"><table>
+<tr><th>1그룹</th><td>마지막 글자를 그 글자의 <b>い</b>단으로 + <b>ます</b></td></tr>
+<tr><th>2그룹</th><td><b>る</b> 떼고 + <b>ます</b></td></tr>
+<tr><th>3그룹</th><td><b>する</b> → <b>します</b> · <b>くる</b> → <b>きます</b></td></tr>
+</table></div>
+<h3>ます 로 바꾸기</h3>
+<div class="wrap"><table>
+<tr><td><b>かかる</b> <i>걸리다</i></td><td><b>かかります</b></td><td><b>あう</b> <i>만나다</i></td><td><b>あいます</b></td></tr>
+<tr><td><b>ある</b> <i>(사물) 있다</i></td><td><b>あります</b></td><td><b>たべる</b> <i>먹다</i></td><td><b>たべます</b></td></tr>
+<tr><td><b>わすれる</b> <i>(물건) 잊어버리다</i></td><td><b>わすれます</b></td><td><b>とる</b> <i>사진 찍다, 취하다</i></td><td><b>とります</b></td></tr>
+<tr><td><b>いそぐ</b> <i>서두르다</i></td><td><b>いそぎます</b></td><td><b>あそぶ</b> <i>놀다</i></td><td><b>あそびます</b></td></tr>
+<tr><td><b>でかける</b> <i>외출하다</i></td><td><b>でかけます</b></td><td><b>やすむ</b> <i>쉬다</i></td><td><b>やすみます</b></td></tr>
+<tr><td><b>ねる</b> <i>자다</i></td><td><b>ねます</b></td><td><b>いく</b> <i>가다</i></td><td><b>いきます</b></td></tr>
+<tr><td><b>する</b> <i>하다</i></td><td><b>します</b></td><td><b>かう</b> <i>사다</i></td><td><b>かいます</b></td></tr>
+</table></div>
+</section>
+
+<section id="nai">
+<h2><span>ない</span> <small>안 한다 · 반말, 부정</small></h2>
+<div class="wrap"><table>
+<tr><th>1그룹</th><td>마지막 글자를 그 글자의 <b>あ</b>단으로 + <b>ない</b><br>＊ 예외: <b>う</b> → <b>わ</b> + ない <i>예)</i> <b>あう</b> → <b>あわない</b> · <b>いく</b> → <b>いかない</b></td></tr>
+<tr><th>2그룹</th><td><b>る</b> 떼고 + <b>ない</b></td></tr>
+<tr><th>3그룹</th><td><b>する</b> → <b>しない</b> · <b>くる</b> → <b>こない</b></td></tr>
+</table></div>
+<h3>ない 로 바꾸기</h3>
+<div class="wrap"><table>
+<tr><td><b>ふる</b> <i>비가 오다</i></td><td><b>ふらない</b></td><td><b>ねる</b> <i>자다</i></td><td><b>ねない</b></td></tr>
+<tr><td><b>はたらく</b> <i>일하다</i></td><td><b>はたらかない</b></td><td><b>とる</b> <i>잡다</i></td><td><b>とらない</b></td></tr>
+<tr><td><b>あるく</b> <i>걷다</i></td><td><b>あるかない</b></td><td><b>つかう</b> <i>사용하다</i></td><td><b>つかわない</b></td></tr>
+<tr><td><b>やすむ</b> <i>쉬다</i></td><td><b>やすまない</b></td><td><b>はなす</b> <i>말하다</i></td><td><b>はなさない</b></td></tr>
+<tr><td><b>いく</b> <i>가다</i></td><td><b>いかない</b></td><td><b>する</b> <i>하다</i></td><td><b>しない</b></td></tr>
+</table></div>
+<h3>문장 만들기</h3>
+<p class="s"><span>① ないです — 안 한다. 커피를 안 마신다</span><b>コーヒーを のまない</b></p>
+<p class="s"><span>② ないでください — ~하지 말아 주세요. 담배를 피우지 말아 주세요</span><b>タバコを すわないでください</b></p>
+<p class="s"><span>차 안에서 담배를 피우지 말아 주세요</span><b><ruby>車<rt>くるま</rt></ruby>の なかで タバコを すわないでください</b></p>
+</section>
+
+<section id="ta">
+<h2><span>た</span> <small>~했다 · 반말, 과거</small></h2>
+<div class="wrap"><table>
+<tr><th rowspan="5">1그룹</th><td><b>う つ る</b></td><td>떼고 + <b>った</b></td></tr>
+<tr><td><b>ぬ ぶ む</b></td><td>떼고 + <b>んだ</b></td></tr>
+<tr><td><b>く</b></td><td>떼고 + <b>いた</b></td></tr>
+<tr><td><b>ぐ</b></td><td>떼고 + <b>いだ</b></td></tr>
+<tr><td><b>す</b></td><td>떼고 + <b>した</b></td></tr>
+<tr><th>2그룹</th><td colspan="2"><b>る</b> 떼고 + <b>た</b></td></tr>
+<tr><th>3그룹</th><td colspan="2"><b>する</b> → <b>した</b> · <b>くる</b> → <b>きた</b></td></tr>
+</table></div>
+<p class="tip">★ た형 예외: <b>いく</b>(가다) ⇒ <b>いった</b></p>
+<h3>た형 바꾸기</h3>
+<div class="wrap"><table>
+<tr><td><b>かう</b> <i>사다</i></td><td><b>かった</b></td><td><b>わすれる</b> <i>잊어버리다</i></td><td><b>わすれた</b></td></tr>
+<tr><td><b>のこす</b> <i>남기다</i></td><td><b>のこした</b></td><td><b>いく</b> <i>가다</i></td><td><b>いった</b></td></tr>
+<tr><td><b>あびる</b> <i>샤워하다, 씻다</i></td><td><b>あびた</b></td><td><b>やすむ</b> <i>쉬다</i></td><td><b>やすんだ</b></td></tr>
+<tr><td><b>たべる</b> <i>먹다</i></td><td><b>たべた</b></td><td><b>のむ</b> <i>마시다</i></td><td><b>のんだ</b></td></tr>
+<tr><td><b>みる</b> <i>보다</i></td><td><b>みた</b></td><td><b>あう</b> <i>만나다</i></td><td><b>あった</b></td></tr>
+</table></div>
+</section>
+
+<section id="te">
+<h2><span>て</span> <small>① ~하고(and) ② ~해서(이유) · 동사인 경우</small></h2>
+<div class="wrap"><table>
+<tr><th rowspan="5">1그룹</th><td><b>う つ る</b></td><td>떼고 + <b>って</b></td></tr>
+<tr><td><b>ぬ ぶ む</b></td><td>떼고 + <b>んで</b></td></tr>
+<tr><td><b>く</b></td><td>떼고 + <b>いて</b></td></tr>
+<tr><td><b>ぐ</b></td><td>떼고 + <b>いで</b></td></tr>
+<tr><td><b>す</b></td><td>떼고 + <b>して</b></td></tr>
+<tr><th>2그룹</th><td colspan="2"><b>る</b> 떼고 + <b>て</b></td></tr>
+<tr><th>3그룹</th><td colspan="2"><b>する</b> → <b>して</b> · <b>くる</b> → <b>きて</b></td></tr>
+</table></div>
+<p class="tip">て형은 명령어도 된다. 예) <b>たべて</b>: 먹어 — 부드럽게 하려면 <b>ね</b> 를 붙인다.<br><b>いく</b>(가다)는 예외로 <b>いって</b></p>
+<h3>て형 바꾸기</h3>
+<div class="wrap"><table>
+<tr><td><b>かかる</b> <i>시간이 걸리다</i></td><td><b>かかって</b></td><td><b>くる</b> <i>오다</i></td><td><b>きて</b> <i>와서, 오고</i></td></tr>
+<tr><td><b>もらう</b> <i>받다</i></td><td><b>もらって</b></td><td>★ <b>あう</b> <i>만나다</i></td><td><b>あって</b></td></tr>
+<tr><td><b>つづける</b> <i>계속하다</i></td><td><b>つづけて</b></td><td><b>おもう</b> <i>생각하다</i></td><td><b>おもって</b></td></tr>
+<tr><td><b>あきらめる</b> <i>포기하다</i></td><td><b>あきらめて</b></td><td><b>まつ</b> <i>기다리다</i></td><td><b>まって</b></td></tr>
+</table></div>
+<p class="tip">★ '만나다'는 무조건 <b>に</b>! 친구를 만나다 = <b>ともだちに あう</b> (を 아님) · 살다도 <b>に すむ</b></p>
+</section>
+
+<section id="all">
+<h2><span>동사 활용 한눈에</span></h2>
+<div class="wrap"><table>
+<tr><td>하다</td><td>원형</td><td>했다</td><td><b>た</b></td></tr>
+<tr><td>합니다</td><td><b>ます</b></td><td>했습니다</td><td><b>ました</b></td></tr>
+<tr><td>안 한다</td><td><b>ない</b></td><td>안 했다</td><td><b>なかった</b></td></tr>
+<tr><td>안 합니다</td><td><b>ないです</b> / <b>ません</b></td><td>안 했습니다</td><td><b>なかったです</b> / <b>ませんでした</b></td></tr>
+</table></div>
+</section>
+
+<section id="mae">
+<h2><span>前に · 後に</span> <small>~하기 전에 · ~한 후에</small></h2>
+<div class="wrap"><table>
+<tr><td><b><ruby>前<rt>まえ</rt></ruby>に</b></td><td>전에</td><td>동사 <u>원형</u> + 前に</td></tr>
+<tr><td><b><ruby>後<rt>あと</rt></ruby>に</b></td><td>후에</td><td>동사 <u>た형</u> + 後に</td></tr>
+</table></div>
+<p class="s"><span>사기 전에 / 산 후에</span><b>かう まえに</b> / <b>かった あとに</b></p>
+<p class="s"><span>남기기 전에</span><b>のこす まえに</b></p>
+<p class="s"><span>먹기 전에</span><b>たべる まえに</b></p>
+<p><b>あびる まえに</b> · <b>みる まえに</b> · <b>わすれる まえに</b> · <b>いく まえに</b> · <b>やすむ まえに</b> · <b>あう まえに</b></p>
+</section>
+
+<section id="koto">
+<h2><span>~한 적 · ~할 때 · ~한다면</span></h2>
+<div class="wrap"><table>
+<tr><td><b>~た ことが あります</b></td><td>~한 적이 있다</td><td>た형 +</td></tr>
+<tr><td><b>~ときが あります</b></td><td>~할 때가 있다 <i>(<ruby>時<rt>とき</rt></ruby>)</i></td><td>동사 원형 +</td></tr>
+<tr><td><b>~たら</b></td><td>~한다면</td><td>た형으로 바꿔서 + ら <i>예)</i> <b>ねたら</b> 잔다면</td></tr>
+</table></div>
+<p class="s"><span>여행 중에 점심을 먹은 후에 길을 잃은 적이 있다.</span><b>りょこうちゅうに ひるごはんを たべた あとに みちを わすれた ことが あります</b></p>
+<p class="fix">'길을 잃다'는 보통 <b>みちに まよう</b> 라고 해요 → <b>みちに まよった ことが あります</b></p>
+<p class="s"><span>갱년기가 올 때가 있다.</span><b><ruby>更年期<rt>こうねんき</rt></ruby>が <ruby>来<rt>く</rt></ruby>る ときが あります</b></p>
+<p class="s"><span>과거를 기억할 때가 있다.</span><b>かこを きおくする ときが あります</b></p>
+</section>
+
+<section id="adj">
+<h2><span>くて · で</span> <small>7~9 · い, な형용사인 경우</small></h2>
+<div class="wrap"><table>
+<tr><th>い형용사</th><td><b>い</b> 떼고 + <b>くて</b></td><td rowspan="2">① ~이고<br>② ~해서, ~여서 (이유)</td></tr>
+<tr><th>な형용사</th><td><b>だ</b> 떼고 + <b>で</b> <i>(な형용사는 だ로 끝남)</i></td></tr>
+</table></div>
+<h3>い · な형용사 추측하기</h3>
+<p class="s"><b>はい、シンプルで、にんきです</b></p>
+<p class="s"><b>のみものは コーヒーで お<ruby>願<rt>ねが</rt></ruby>いします</b></p>
+<p class="tip">で 를 썼으니 ⇒ な형용사이고 だ로 끝난다고 추측할 수 있다</p>
+<p class="s"><span>★ 날씨가 좋아서 — いい / よい 중에 よい 를 쓴다</span><b>てんきが よくて、</b></p>
+</section>
+
+<section id="kedo">
+<h2><span>ですが · けど · のに</span> <small>10~12</small></h2>
+<div class="wrap"><table>
+<tr><td><b>ですが</b></td><td>~이지만</td></tr>
+<tr><td><b>けど</b></td><td>~인데, ~입니다만</td></tr>
+<tr><td><b>のに</b></td><td>그럼에도 불구하고</td></tr>
+</table></div>
+<h3>けど 붙이는 방법</h3>
+<div class="wrap"><table>
+<tr><th></th><th>반말</th><th>존댓말</th></tr>
+<tr><th>명사</th><td>★ <b>だけど</b></td><td><b>ですけど</b></td></tr>
+<tr><th>い형용사</th><td><b>い けど</b></td><td><b>です けど</b></td></tr>
+<tr><th>な형용사</th><td><b>だ けど</b></td><td>だ 지우고 <b>ですけど</b> 를 붙인다</td></tr>
+<tr><th>동사</th><td>원형 + <b>けど</b></td><td><b>ます けど</b></td></tr>
+</table></div>
+</section>
+
+<section id="tai">
+<h2><span>たいです</span> <small>10~12 · ~하고 싶다</small></h2>
+<p class="tip">ます형에서 ます 빼고 たいです 를 이어 붙인다</p>
+<p><b>いきます</b> → <b>いきたいです</b> · <b>あいます</b> → <b>あいたいです</b> <i>(ます 만드는 법은 <a href="#masu">ます</a> 참고)</i></p>
+<p class="s"><span>친구를 만나고 싶어요. ('만나다'는 に)</span><b>ともだちに あいたいです</b></p>
+<p class="s"><span>일본 여행을 가고 싶다.</span><b>にほんの りょこうに いきたい</b></p>
+</section>
+
+<section id="suki">
+<h2><span>が すきです</span> <small>무조건 が 를 써야 함</small></h2>
+<div class="wrap"><table>
+<tr><td>(명사) <b>が すきです</b></td><td>좋아하다</td></tr>
+<tr><td>(명사) <b>が きらいです</b></td><td>싫어하다</td></tr>
+<tr><td>★ (명사) <b>が にがてです</b></td><td>서툴다 <i>(음식 못 먹을 때 자주 씀)</i></td></tr>
+<tr><td>(명사) <b>が とくいです</b></td><td>잘하다, 능숙하다</td></tr>
+<tr><td>(명사) <b>が じょうずです</b></td><td>잘하다</td></tr>
+<tr><td>(명사) <b>が へたです</b></td><td>못하다</td></tr>
+<tr><td>(명사) <b>が うまいです</b></td><td>잘하다</td></tr>
+</table></div>
+<p class="s"><span>혼자만의 시간을 좋아해요.</span><b>ひとりの じかんが すきです</b></p>
+<p class="s"><span>탕수육을 좋아합니다. / 되게 좋아.</span><b>すぶたが すきです</b> / <b>とても すきです</b></p>
+</section>
+
+<section id="naru">
+<h2><span>~に / く なります</span> <small>~이 되다, ~해지다</small></h2>
+<div class="wrap"><table>
+<tr><th>명사</th><td>명사 + <b>に なります</b></td></tr>
+<tr><th>い형용사</th><td><b>い</b> → <b>く なります</b></td></tr>
+<tr><th>な형용사</th><td><b>だ</b> 떼고 + <b>に なります</b></td></tr>
+<tr><th>동사</th><td>원형 + <b>ように なります</b></td></tr>
+</table></div>
+<p class="s"><span>~이 되고 싶다</span><b>~に / く なりたいです</b></p>
+</section>
+
+<section id="sou">
+<h2><span>そうだ · みたいだ · らしい</span> <small>34~36 · ~인 것 같다</small></h2>
+<div class="wrap"><table>
+<tr><th>명사</th><td>(そうだ ×) → <b>みたいだ</b> / <b>みたいです</b></td></tr>
+<tr><th>い형용사</th><td><b>い</b> 떼고 + <b>そうだ</b> / <b>そうです</b></td></tr>
+<tr><th>な형용사</th><td><b>だ</b> 떼고 + <b>そうだ</b> / <b>そうです</b></td></tr>
+<tr><th>동사</th><td>ます형에서 <b>ます</b> 떼고 + <b>そうだ</b> / <b>そうです</b></td></tr>
+</table></div>
+<p class="tip">이 표현들을 잘 못 쓰겠다면 <b>~と おもいます</b> 로 통일해서 쓰면 쉽다.</p>
+<p class="s"><span>맛있어 보인다.</span><b>おいしそうです</b></p>
+<p class="s"><span>비가 올 것 같다.</span><b>あめが ふりそうです</b></p>
+<p class="s"><span>~らしいよ — 어디서 들어서 '진짜 그렇다더라'</span><b>~らしいよ</b></p>
+</section>
+
+<section id="sugiru">
+<h2><span>すぎる</span> <small>너무 ~하다</small></h2>
+<p>원래 뜻은 ① 시간이 지나다 ② ~를 지나치다</p>
+<p class="tip">すぎる 는 ①, ②번이 기본인데, 다른 동사가 붙으면 '너무 ~하다'가 된다.</p>
+<div class="wrap"><table>
+<tr><td><b>いいすぎる</b></td><td>말이 지나치다</td></tr>
+<tr><td><b>たべすぎる</b></td><td>너무 많이 먹다</td></tr>
+<tr><td><b>ねすぎる</b></td><td>너무 많이 잤다</td></tr>
+</table></div>
+</section>
+
+<section id="etc">
+<h2><span>표현 모음</span></h2>
+<div class="wrap"><table>
+<tr><td><b>できます</b></td><td>할 수 있다</td></tr>
+<tr><td><b>できました</b></td><td>해냈습니다 / 완료했습니다</td></tr>
+<tr><td>(명사) <b><ruby>中<rt>ちゅう</rt></ruby>です</b></td><td>~하는 중입니다 <i>— 무조건 명사가 앞에 붙어야 함</i></td></tr>
+<tr><td><b>ぐあいが わるい</b> / <b>たいちょうが わるい</b></td><td>몸 · 컨디션이 안 좋아 보인다</td></tr>
+<tr><td><b>ちょうし</b> · <b>ぐあい</b></td><td>컨디션 <i>(9번 표현 숙지)</i></td></tr>
+<tr><td><b>ひまだ</b></td><td>한가하다</td></tr>
+<tr><td><b>あんまり</b></td><td>별로, 그다지</td></tr>
+</table></div>
+<h3>얼마에 몇 번</h3>
+<div class="wrap"><table>
+<tr><td>한 달에 한 번</td><td><b>いっかげつで いっかい</b></td><td><b>○かげつ で ○かい</b></td></tr>
+<tr><td>한 주에 ○번</td><td colspan="2"><b>いっしゅうかん で ○かい</b></td></tr>
+<tr><td>하루에 ○번</td><td colspan="2"><b>いちにち で ○かい</b></td></tr>
+</table></div>
+<p class="fix">'~에 몇 번'은 <b>に</b> 도 많이 써요 → <b>いっかげつに いっかい</b></p>
+</section>
+
+<section id="write">
+<h2><span>작문</span> <small>내가 만든 문장</small></h2>
+<h3>취미에 대해서 이야기해 봅시다</h3>
+<p class="s"><span>다양한 아이디어가 있는 웹, 앱 서비스를 만드는 것이 취미입니다.</span><b>たような アイデアが ある ウェブサイトを つくる ものが できます</b></p>
+<p class="fix">'만드는 것이 취미입니다'는 <b>つくるのが しゅみです</b></p>
+
+<h3>좋아하는 음식</h3>
+<p class="s"><span>집 근처에 가격이 저렴하고 요리를 잘하는 곳이 있어서, 그 상점의 탕수육을 좋아합니다.</span><b>いえの ちかくで やすくて、りょうりが じょうずな ばしょが あるので、あの みせの すぶたが すきです</b></p>
+
+<h3>회사</h3>
+<p class="s"><span>자유를 못 느껴서, 회사에서 일하는 것이 싫어졌다.</span><b>じゆうを かんじられませんから、かいしゃで はたらくのが きらいです</b></p>
+
+<h3>일요일</h3>
+<p class="s"><span>일요일은 컨디션은 양호하고, 수업이 끝난 후, 한가하고, 자유롭다.</span><b>にちようびは、ちょうしは よくて、じゅぎょうが おわった あと、ひまで、じゆうです</b></p>
+
+<h3>지금까지 가장 맛있었던 음식</h3>
+<p class="s"><span>뉴욕에서 먹었던 랍스터롤이 가장 좋았다. 빵에 랍스터를 넣어 먹는 건데, 이건 먹어야 맛을 알 수 있다.</span><b>ニューヨークで たべた ロブスターロールが いちばん すきでした。パンに ロブスターを <ruby>入<rt>い</rt></ruby>れて たべる ものですけど、これは たべなかったら、あじを わからないです</b></p>
+<p class="tip"><b>わからないです</b> 모른다 · <b>わかれないです</b> 알 수 없다 · <b>あじ</b> 맛 · <b>りょうり</b> 요리</p>
+
+<h3>만나고 싶은 사람</h3>
+<p class="s"><span>만날 수는 없지만, 이재용을 만나고 싶습니다. 그래서 노력 중입니다.</span><b>あえないけど、</b>이재용<b>に あいたいです。それで、どりょく<ruby>中<rt>ちゅう</rt></ruby>です</b></p>
+
+<h3>만약 복권에 당첨되면</h3>
+<p class="s"><span>만약 복권에 당첨되어, 회사를 그만두고 여행을 잠시 가고 싶다.</span><b>もし たからくじが あたって、かいしゃを やめて、りょこうに ちょっと いきたいです</b></p>
+</section>
+</div>
+<script>
+// 파란 글씨(b)를 누르면 읽어 준다. 후리가나(rt)와 한글·기호는 빼고 일본어만 읽는다.
+document.addEventListener('click', e => {
+  const b = e.target.closest('b');
+  if (!b || !window.speechSynthesis) return;
+  const c = b.cloneNode(true);
+  c.querySelectorAll('rt').forEach(r => r.remove());
+  const u = new SpeechSynthesisUtterance(c.textContent.replace(/[^ぁ-んァ-ヶー一-龠々、。]/g, ''));
+  u.lang = 'ja-JP';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+});
+</script>
