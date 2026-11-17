@@ -2,9 +2,10 @@
 
 개발 기초를 4지선다 문제로 익히는 학습지입니다. 문제를 풀기 전에 개념을 읽고, 코드를 직접 쳐서 실행해 실제 결과를 확인할 수 있습니다.
 
-- 개발 기초(`/`): 16개 종류, 155문제. MSSQL, C#, Blazor, JavaScript, TypeScript, Node.js, React, Next.js, Tailwind CSS, Rust, IT 면접 기초, 네트워크 기초, 설계와 아키텍처, 테스트, 보안, 성능과 동시성
+- 개발 기초(`/`): 21개 종류, 188문제. 업무 자동화(Playwright, 크롤링·API 연동, n8n·Airflow, 설계·운영, Python 기초 — `q/auto*.js`), MSSQL, C#, Blazor, JavaScript, TypeScript, Node.js, React, Next.js, Tailwind CSS, Rust, IT 면접 기초, 네트워크 기초, 설계와 아키텍처, 테스트, 보안, 성능과 동시성
 - 일본어 학습지(`/ja`): Lv1(글자)~Lv6(N1) 60문제 + 필수 동사·형용사·명사·부사·숙어·회화(요즘 표현)·숫자·시간·달력 257문제. 글자·문법·어휘·빈칸·듣기(브라우저 음성)·읽기 (`wwwroot/q/jp*.js`, 화면은 `wwwroot/ja.js`)
 - 일본어 수업 노트(`/note.html`): 수업 때 공책에 적은 문법·문장을 옮긴 정적 페이지(`wwwroot/note.html`). 일본어를 누르면 읽어 준다
+- 자동화 개발자 면접 준비(`/interview.html`): 공고 읽기, 과제 연습, 예상 질문과 답의 뼈대, 2주 계획을 담은 정적 페이지
 - 상식 학습지(`/common`): 일반·IT·시사경제 상식 30문제 (`wwwroot/q/gk-*.js`, id 가 `GK` 로 시작). 기록·성장 기록은 일본어와 같은 방식이고 따로 집계한다(`/api/stats?p=GK`)
   - 로그인하면 푼 문제가 서버 DB(SQLite, `QUIZ_DATA/learn.db`)에 쌓이고, "성장 기록"에서 주별·레벨별·유형별 정답률과 자주 틀린 문제를 본다
   - "내 단어장": 문제의 단어를 담아 1→3→7→14→30→60일 간격으로 복습한다

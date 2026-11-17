@@ -197,9 +197,12 @@ function home() {
     a.href = href;
     tabs.append(a);
   });
-  const note = el('a', '수업 노트');   // 일본어 수업 노트(정적 페이지)
-  note.href = '/note.html';
-  tabs.append(note);
+  // 정적 페이지: 일본어 수업 노트, 자동화 개발자 면접 준비
+  for (const [label, href] of [['수업 노트', '/note.html'], ['면접 준비', '/interview.html']]) {
+    const a = el('a', label);
+    a.href = href;
+    tabs.append(a);
+  }
   app.replaceChildren(
     tabs,
     el('h1', document.title, 'title'),

@@ -262,7 +262,7 @@ li { margin: 4px 0; }
 }
 
 /* 개발 / 일본어 탭 */
-.tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
 .tabs a { padding: 6px 16px; border: 1.5px solid var(--ink); color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; }
 .tabs a.on { background: var(--ink); color: var(--paper); }
 

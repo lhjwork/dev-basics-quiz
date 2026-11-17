@@ -1,0 +1,106 @@
+// 업무 자동화 개발자 준비 (1): 브라우저 자동화(Playwright) → 크롤링·API 연동.
+// 가장 기초(브라우저 자동화가 무엇인가)부터 쌓는다. 서버에 Playwright 가 없어서 "직접 실행" 칸은 두지 않는다.
+
+Q.push(
+  // ── Playwright ──
+  { id: 'AU1', t: '자동화 · Playwright', lv: '하', q: 'Playwright 는 무엇을 하는 도구일까?',
+    c: ['서버의 CPU 사용량을 재는 도구', '코드로 브라우저를 조종해 사람이 하던 클릭·입력을 대신 하게 하는 도구', '데이터베이스를 백업하는 도구', '디자인 시안을 그리는 도구'], a: 1,
+    k: ['사람이 웹사이트에서 하는 일(주소 열기 → 로그인 → 버튼 누르기 → 표 내려받기)을 코드로 적어 두면, 프로그램이 진짜 브라우저를 열어 똑같이 해 준다. 이것이 브라우저 자동화다.\nPlaywright 는 그 일을 하는 라이브러리다. 크롬(Chromium)·파이어폭스·사파리(WebKit)를 모두 조종할 수 있고, Node.js 와 Python 둘 다에서 쓴다. 원래는 화면 테스트용이지만, 반복 업무 자동화에도 그대로 쓴다.',
+     "const { chromium } = require('playwright');\n\nconst browser = await chromium.launch();      // 브라우저 켜기\nconst page = await browser.newPage();         // 새 탭\nawait page.goto('https://example.com');       // 주소 열기\nconsole.log(await page.title());              // → Example Domain\nawait browser.close();"],
+    ex: 'Playwright 는 코드로 브라우저를 조종한다. API 가 없는 관리자 페이지에서 매일 엑셀을 내려받는 일처럼, 사람이 화면으로만 할 수 있던 일을 자동화할 때 쓴다.',
+    w: ['서버 모니터링 도구가 아니다.', null, 'DB 와는 관계없다. 브라우저를 다룬다.', '화면을 그리는 도구가 아니라, 이미 있는 화면을 조작하는 도구다.'] },
+
+  { id: 'AU2', t: '자동화 · Playwright', lv: '하', q: 'Playwright 코드에서 거의 모든 줄 앞에 await 를 붙이는 이유는?',
+    code: "await page.goto('https://example.com');\nawait page.click('text=로그인');",
+    c: ['코드를 더 빠르게 하려고', '브라우저가 그 동작을 끝낼 때까지 기다린 뒤 다음 줄로 가려고', '에러를 숨기려고', '브라우저 창을 크게 하려고'], a: 1,
+    k: ['브라우저 동작(페이지 열기, 클릭)은 시간이 걸린다. 그래서 Playwright 의 함수는 "곧 끝날 일"을 뜻하는 Promise 를 돌려준다.\nawait 는 그 일이 끝날 때까지 기다리라는 뜻이다. await 를 빼면 페이지가 열리기도 전에 다음 줄(클릭)이 실행되어, 어떤 날은 되고 어떤 날은 안 되는 불안정한 자동화가 된다.',
+     "page.goto(url);                  // await 없음: 열리는 중인데 다음 줄로 감\nawait page.click('text=로그인');   // → 가끔 실패\n\nawait page.goto(url);            // 다 열린 뒤\nawait page.click('text=로그인');   // → 안정적으로 클릭"],
+    ex: 'await 는 "이 동작이 끝난 뒤에 다음으로"를 보장한다. 자동화가 가끔만 실패한다면 await 를 빠뜨린 줄이 있는지부터 본다.',
+    w: ['빨라지지 않는다. 오히려 기다리는 것이다. 순서를 지키기 위해 쓴다.', null, '에러를 숨기지 않는다. 오히려 await 가 있어야 실패가 그 줄에서 에러로 잡힌다.', '창 크기와 관계없다.'] },
+
+  { id: 'AU3', t: '자동화 · Playwright', lv: '하', q: '「로그인」 버튼을 찾는 방법 중, 화면 디자인이 바뀌어도 가장 덜 깨지는 것은?',
+    c: ["page.locator('div > div:nth-child(3) > button')", "page.getByRole('button', { name: '로그인' })", "page.locator('.css-1x2y3z')", "page.mouse.click(520, 310)"], a: 1,
+    k: ['화면에서 요소를 찾는 방법을 로케이터(locator)라고 한다. 자동화가 깨지는 가장 흔한 이유는 "사이트가 조금 바뀌어서 요소를 못 찾는 것"이다.\n그래서 사용자 눈에 보이는 것(역할과 글자)으로 찾는 것이 가장 튼튼하다.\n・getByRole: 버튼·링크 같은 역할 + 이름\n・getByLabel: 입력칸의 라벨\n・getByText: 보이는 글자\nHTML 구조나 자동 생성된 클래스 이름으로 찾으면 디자인이 바뀔 때마다 고쳐야 한다.',
+     "await page.getByLabel('아이디').fill('hong');\nawait page.getByLabel('비밀번호').fill(process.env.PW);\nawait page.getByRole('button', { name: '로그인' }).click();"],
+    ex: '버튼의 역할과 이름은 디자인을 바꿔도 잘 안 바뀐다. 유지보수를 줄이려면 사용자에게 보이는 것으로 찾는다.',
+    w: ['HTML 구조(몇 번째 div)에 묶여 있어서, 요소 하나만 추가돼도 깨진다.', null, '빌드할 때마다 바뀔 수 있는 자동 생성 클래스 이름이다.', '좌표는 창 크기나 배치가 조금만 달라져도 엉뚱한 곳을 누른다.'] },
+
+  { id: 'AU4', t: '자동화 · Playwright', lv: '중', q: '버튼을 누른 뒤 결과 표가 늦게 뜬다. 가장 좋은 기다리는 방법은?',
+    c: ['await page.waitForTimeout(5000) 으로 5초 기다린다', "await expect(page.getByRole('table')).toBeVisible() 처럼 표가 보일 때까지 기다린다", '기다리지 않고 바로 읽는다', 'for 문을 1억 번 돌린다'], a: 1,
+    k: ['"몇 초 기다리기"는 두 가지로 나쁘다. 느린 날에는 5초로 모자라 실패하고, 빠른 날에는 쓸데없이 5초를 버린다.\nPlaywright 는 조건이 될 때까지만 기다리는 기능이 있다. click, fill 같은 동작은 요소가 나타나고 누를 수 있을 때까지 스스로 기다린다(자동 대기). 결과를 확인할 때는 expect 로 "보일 때까지" 기다린다.',
+     "await page.getByRole('button', { name: '조회' }).click();\nawait expect(page.getByRole('table')).toBeVisible();   // 표가 뜨면 바로 통과\nconst rows = await page.getByRole('row').count();\nconsole.log(rows);   // → 21"],
+    ex: '시간이 아니라 조건을 기다린다. 표가 1초 만에 뜨면 1초, 8초 걸리면 8초를 기다리고, 끝내 안 뜨면 에러로 알려 준다.',
+    w: ['고정된 시간은 느린 날엔 모자라고 빠른 날엔 낭비다. 공식 문서도 디버깅 말고는 쓰지 말라고 한다.', null, '표가 뜨기 전에 읽으면 빈 값이 나온다.', 'CPU 만 쓰고, 얼마나 기다릴지도 정확하지 않다.'] },
+
+  { id: 'AU5', t: '자동화 · Playwright', lv: '중', q: '서버(화면 없는 리눅스)에서 매일 새벽에 자동화를 돌리려 한다. 알맞은 실행 방식은?',
+    c: ['모니터를 서버에 연결한다', 'headless 모드(창을 띄우지 않고 실행)로 돌린다', '사람이 새벽에 일어나 직접 실행한다', '브라우저 없이는 불가능하다'], a: 1,
+    k: ['headless 는 브라우저 창을 화면에 그리지 않고 뒤에서 실행하는 방식이다. 화면이 없는 서버에서도 돌고 더 빠르다. Playwright 는 기본값이 headless 다.\n만들 때는 창을 보면서(headed) 천천히 돌려 확인하고, 운영할 때는 headless 로 돌린다.',
+     "// 만들 때: 창을 보면서 천천히\nconst browser = await chromium.launch({ headless: false, slowMo: 300 });\n\n// 서버에서 돌릴 때: 기본값(headless)\nconst browser = await chromium.launch();"],
+    ex: '서버에서는 headless 로 돌린다. 창이 안 보이니, 실패했을 때 무슨 일이 있었는지 알 수 있도록 스크린샷과 로그를 남기는 것이 짝이다.',
+    w: ['모니터는 필요 없다. headless 는 화면 없이 돈다.', null, '그러면 자동화가 아니다. 스케줄러(cron, Airflow 등)가 시간에 맞춰 실행한다.', 'headless 로 가능하다.'] },
+
+  { id: 'AU6', t: '자동화 · Playwright', lv: '중', q: '매번 로그인부터 하느라 느리고, 로그인 시도가 많아 계정이 잠길 위험도 있다. 알맞은 방법은?',
+    c: ['비밀번호를 코드에 적어 둔다', '로그인한 상태(쿠키 등)를 파일로 저장해 두고 다음 실행에서 불러온다', '로그인이 필요 없는 사이트만 자동화한다', '실행할 때마다 계정을 새로 만든다'], a: 1,
+    k: ['로그인하면 브라우저에 쿠키·저장소 값이 생기고, 그것이 "로그인한 상태"다. Playwright 는 이 상태를 파일로 저장(storageState)했다가 다음에 그대로 불러올 수 있다.\n한 번 로그인 → 상태 저장 → 다음부터는 로그인 화면을 건너뛴다. 세션이 만료되면 다시 로그인해 새로 저장한다. 이 파일은 비밀번호와 같은 값이므로 git 에 올리지 않는다.',
+     "// 처음 한 번: 로그인하고 상태 저장\nawait context.storageState({ path: 'auth.json' });\n\n// 다음부터: 저장한 상태로 시작\nconst context = await browser.newContext({ storageState: 'auth.json' });\nconst page = await context.newPage();\nawait page.goto('https://admin.example.com');   // → 이미 로그인된 화면"],
+    ex: '로그인 상태를 저장해 재사용하면 빠르고, 로그인 시도 횟수도 줄어든다. 만료됐을 때 다시 로그인하는 처리(예외 처리)를 함께 넣는다.',
+    w: ['코드에 비밀번호를 적으면 저장소를 보는 모든 사람에게 노출된다. 환경 변수나 비밀 저장소에 둔다.', null, '사내 업무 대부분은 로그인이 필요하다. 피할 수 없다.', '문제를 키울 뿐이다.'] },
+
+  { id: 'AU7', t: '자동화 · Playwright', lv: '중', q: '「엑셀 다운로드」 버튼을 눌러 받은 파일을 정해진 폴더에 저장하려 한다. 빈칸에 알맞은 것은?',
+    code: "const downloadPromise = page.waitForEvent('______');\nawait page.getByRole('button', { name: '엑셀 다운로드' }).click();\nconst download = await downloadPromise;\nawait download.saveAs('reports/today.xlsx');",
+    c: ['click', 'download', 'close', 'load'], a: 1,
+    k: ['파일 내려받기는 "버튼을 누른 뒤 언젠가 시작되는 일"이다. 그래서 누르기 전에 미리 "다운로드가 시작되면 알려 줘"(waitForEvent)라고 걸어 두고, 그다음에 버튼을 누른다.\n순서가 중요하다. 누른 뒤에 기다리기 시작하면 이미 시작된 다운로드를 놓칠 수 있다.',
+     "const downloadPromise = page.waitForEvent('download');   // ① 먼저 기다림을 건다\nawait page.getByText('엑셀 다운로드').click();             // ② 누른다\nconst download = await downloadPromise;                   // ③ 시작된 다운로드를 받는다\nconsole.log(download.suggestedFilename());                // → 매출_2026-11.xlsx\nawait download.saveAs('reports/today.xlsx');"],
+    ex: "내려받기가 시작되는 사건의 이름은 'download' 다. 받은 파일은 saveAs 로 원하는 곳에 저장한다.",
+    w: ['click 은 기다릴 사건이 아니라 우리가 하는 동작이다.', null, 'close 는 페이지가 닫힐 때 생기는 사건이다.', 'load 는 페이지가 다 열렸을 때 생기는 사건이다.'] },
+
+  { id: 'AU8', t: '자동화 · Playwright', lv: '상', q: '새벽에 headless 로 돈 자동화가 실패했다. 아침에 원인을 알 수 있게 하려면 무엇을 남겨야 할까?',
+    c: ['아무것도 남기지 않고 다시 돌려 본다', '실패한 순간의 스크린샷, 에러 메시지, 단계별 로그(필요하면 trace)', '성공했다는 메시지만', '브라우저 버전만'], a: 1,
+    k: ['headless 는 화면이 안 보이므로, 실패하면 "그때 화면이 어땠는지"를 알 수 없다. 그래서 실패할 때 증거를 남기도록 만든다.\n・스크린샷: 실패 순간의 화면 (로그인이 풀렸나? 팝업이 떴나?)\n・로그: 어느 단계까지 갔는지\n・trace: 모든 동작·화면·네트워크를 기록한 파일. 나중에 단계별로 돌려 본다\n같은 문제가 다시 생기지 않을 수도 있어서, "다시 돌려 보기"만으로는 원인을 못 찾는다.',
+     "try {\n  await run(page);\n  console.log('완료');\n} catch (e) {\n  await page.screenshot({ path: `fail-${Date.now()}.png`, fullPage: true });\n  console.error('실패:', e.message);   // → 실패: Timeout 30000ms exceeded. waiting for getByRole('table')\n  throw e;                              // 실패를 숨기지 않고 스케줄러에 알린다\n}"],
+    ex: '실패 순간의 스크린샷과 에러, 단계 로그가 있으면 아침에 5분 만에 원인을 안다. 그리고 에러를 다시 던져(throw) 실패가 "성공"으로 기록되지 않게 한다.',
+    w: ['다시 돌렸을 때 성공하면 원인을 영영 모른다. 가끔 나는 실패일수록 증거가 필요하다.', null, '실패했을 때의 정보가 없으면 고칠 수 없다.', '버전만으로는 무슨 일이 있었는지 알 수 없다.'] },
+
+  // ── 크롤링 · API 연동 ──
+  { id: 'AU9', t: '자동화 · 크롤링·API 연동', lv: '하', q: '어떤 사이트의 데이터를 가져와야 한다. 그 사이트가 공식 API 를 제공한다면 무엇을 먼저 쓸까?',
+    c: ['화면을 긁는 크롤링', '공식 API', '화면을 사진으로 찍어 글자를 읽기', '직원에게 매일 복사를 부탁하기'], a: 1,
+    k: ['데이터를 가져오는 길은 여러 가지고, 튼튼한 순서가 있다.\n① 공식 API: 주고받는 모양이 약속돼 있다. 가장 빠르고 덜 깨진다.\n② 화면이 부르는 내부 요청(JSON)을 그대로 호출\n③ HTML 을 받아서 읽기(크롤링)\n④ 브라우저를 조종하기(Playwright)\n아래로 갈수록 느리고, 사이트가 바뀔 때 깨지기 쉽다. 그래서 위에서부터 가능한지 확인한다.',
+     "// API: 필요한 값이 정리된 JSON 으로 온다\nconst res = await fetch('https://api.example.com/orders?date=2026-11-17', {\n  headers: { Authorization: `Bearer ${process.env.API_KEY}` },\n});\nconst orders = await res.json();\nconsole.log(orders.length);   // → 42"],
+    ex: '공식 API 가 있으면 API 를 쓴다. 화면은 디자인이 바뀌면 깨지지만, API 는 약속된 모양이라 오래간다.',
+    w: ['가능하지만 화면이 바뀌면 깨진다. API 가 없을 때의 방법이다.', null, '가장 느리고 부정확하다.', '자동화하려는 일이 바로 그것이다.'] },
+
+  { id: 'AU10', t: '자동화 · 크롤링·API 연동', lv: '하', q: 'fetch 로 HTML 을 받아 왔는데, 브라우저에서는 보이던 상품 목록이 HTML 안에 없다. 가장 그럴듯한 이유는?',
+    c: ['인터넷이 끊겼다', '목록을 페이지가 열린 뒤 자바스크립트가 따로 불러와 그리기 때문이다', 'HTML 은 원래 글자를 담지 못한다', 'fetch 는 영어 사이트만 된다'], a: 1,
+    k: ['웹 페이지는 두 종류가 있다.\n・정적 페이지: 서버가 내용이 다 들어 있는 HTML 을 준다 → fetch 로 받아 읽으면 된다(cheerio 같은 도구로 HTML 을 읽는다).\n・동적 페이지: 빈 틀만 주고, 브라우저에서 자바스크립트가 데이터를 불러와 채운다 → fetch 로 받은 HTML 에는 내용이 없다.\n동적 페이지는 ① 그 자바스크립트가 부르는 데이터 주소(개발자 도구 Network 탭)를 직접 호출하거나 ② Playwright 로 브라우저를 띄워 다 그려진 뒤에 읽는다.',
+     "const html = await (await fetch(url)).text();\nconsole.log(html.includes('상품'));   // → false  (틀만 왔다)\n\n// 방법 ①: 화면이 부르는 데이터 주소를 직접 호출\nconst items = await (await fetch('https://shop.example.com/api/items?page=1')).json();\nconsole.log(items.length);            // → 20"],
+    ex: '자바스크립트가 나중에 채우는 페이지는 HTML 만 받아서는 내용이 없다. Network 탭에서 데이터 요청을 찾으면 브라우저 없이도 가져올 수 있어 가장 빠르다.',
+    w: ['끊겼다면 HTML 자체를 못 받는다.', null, 'HTML 은 글자를 담는다. 이 페이지가 나중에 채우는 방식일 뿐이다.', '언어와 관계없다.'] },
+
+  { id: 'AU11', t: '자동화 · 크롤링·API 연동', lv: '중', q: 'API 를 반복해서 부르다가 응답 코드 429 를 받았다. 무슨 뜻이고 어떻게 해야 할까?',
+    c: ['주소가 틀렸다 → 주소를 고친다', '요청이 너무 많다 → 잠시 쉬었다가 간격을 늘려 다시 시도한다', '서버가 고장 났다 → 포기한다', '성공이다 → 계속한다'], a: 1,
+    k: ['HTTP 응답 코드는 결과를 숫자로 알려 준다.\n・200: 성공\n・401 / 403: 인증 안 됨 / 권한 없음 → 다시 해도 소용없다\n・404: 그런 주소 없음 → 다시 해도 소용없다\n・429: 요청이 너무 많음 → 쉬었다가 다시\n・500, 502, 503: 서버 쪽 문제 → 잠시 뒤 다시 해 볼 만하다\n다시 시도할 때는 1초 → 2초 → 4초처럼 간격을 늘린다(백오프). 같은 간격으로 계속 두드리면 서버를 더 힘들게 하고 차단될 수 있다.',
+     "for (let attempt = 0; attempt < 4; attempt++) {\n  const res = await fetch(url);\n  if (res.ok) return res.json();\n  if (res.status !== 429 && res.status < 500) throw new Error('재시도해도 안 됨: ' + res.status);\n  await new Promise(r => setTimeout(r, 1000 * 2 ** attempt));   // 1초, 2초, 4초, 8초\n}\nthrow new Error('4번 시도했지만 실패');"],
+    ex: '429 는 "너무 자주 불렀다"는 뜻이다. 쉬었다가 간격을 늘려 다시 시도하고, 애초에 요청 사이에 간격을 둔다.',
+    w: ['주소가 틀리면 404 다.', null, '서버 고장은 500 번대다. 그리고 그때도 몇 번은 다시 시도해 본다.', '성공은 200 번대다.'] },
+
+  { id: 'AU12', t: '자동화 · 크롤링·API 연동', lv: '중', q: 'API 키(비밀번호 같은 값)를 자동화 스크립트에서 쓰는 가장 알맞은 방법은?',
+    c: ["코드에 const KEY = 'sk-abc123' 처럼 적는다", '환경 변수(.env 파일 등)에 두고 코드에서는 process.env 로 읽는다. .env 는 git 에 올리지 않는다', '슬랙 채널에 올려 두고 필요할 때 복사한다', '파일 이름에 적어 둔다'], a: 1,
+    k: ['코드는 저장소(Bitbucket, GitHub)에 올라가 여러 사람이 본다. 비밀값이 코드에 있으면 저장소를 볼 수 있는 모든 사람, 그리고 기록(history)에 영원히 남는다.\n그래서 비밀값은 코드 밖에 둔다. 가장 기본은 환경 변수다. 내 컴퓨터에서는 .env 파일에 적고, 그 파일을 .gitignore 에 넣어 올라가지 않게 한다. 서버에서는 서버의 환경 변수나 비밀 저장소에 넣는다.',
+     "# .env  (git 에 올리지 않는다)\nAPI_KEY=sk-abc123\n\n# .gitignore\n.env\n\n// 코드\nconst key = process.env.API_KEY;\nif (!key) throw new Error('API_KEY 가 없습니다');   // 없으면 바로 알려 준다"],
+    ex: '비밀값은 환경 변수로 빼고 저장소에는 올리지 않는다. 한 번 올라간 키는 지워도 기록에 남으므로, 올렸다면 키를 새로 발급받아야 한다.',
+    w: ['저장소를 보는 모든 사람에게 노출되고 기록에 남는다.', null, '채팅방도 여러 사람이 보는 곳이고, 자동화가 읽을 수도 없다.', '파일 이름은 누구나 본다.'] },
+
+  { id: 'AU13', t: '자동화 · 크롤링·API 연동', lv: '중', q: '주문 목록 API 가 한 번에 100건씩만 준다. 오늘 주문 350건을 모두 가져오려면?',
+    c: ['첫 100건만 쓰고 나머지는 버린다', '다음 페이지가 없을 때까지 page(또는 cursor)를 바꿔 가며 반복해서 부른다', 'API 에 "전부 줘"라고 적는다', '같은 요청을 4번 보낸다'], a: 1,
+    k: ['데이터가 많으면 API 는 나눠서 준다. 이것을 페이지네이션이라고 한다. 방식은 보통 둘 중 하나다.\n・page 방식: ?page=1, ?page=2 … 빈 목록이 오면 끝\n・cursor 방식: 응답에 "다음에 이 값을 보내라"(next_cursor)가 들어 있다. 그 값이 없으면 끝\n첫 페이지만 가져와 놓고 "다 가져왔다"고 믿는 것이 자동화에서 아주 흔한 버그다. 숫자가 딱 100, 50 같은 값이면 의심한다.',
+     "const all = [];\nfor (let page = 1; ; page++) {\n  const items = await (await fetch(`${url}?page=${page}&size=100`)).json();\n  if (items.length === 0) break;      // 더 없으면 끝\n  all.push(...items);\n}\nconsole.log(all.length);   // → 350"],
+    ex: '끝이 날 때까지 페이지를 넘기며 모은다. 가져온 건수를 로그에 남기면 "100건만 가져온" 실수를 바로 알아챈다.',
+    w: ['250건을 빠뜨린 리포트가 된다. 틀린 자동화는 없는 것보다 나쁘다.', null, '그런 기능이 있다면 좋지만, 한 번에 주는 양은 API 가 정한다.', '같은 100건을 4번 받을 뿐이다.'] },
+
+  { id: 'AU14', t: '자동화 · 크롤링·API 연동', lv: '중', q: '「새 주문이 들어오면 슬랙에 알림」을 만들려 한다. 웹훅(webhook) 방식의 설명으로 알맞은 것은?',
+    c: ['우리가 1분마다 "새 주문 있어?"라고 물어본다', '주문이 생기면 상대 시스템이 우리 주소로 먼저 알려 준다', '사람이 주문을 보고 직접 알린다', '하루에 한 번 모아서 확인한다'], a: 1,
+    k: ['새 일이 생겼는지 아는 방법은 두 가지다.\n・폴링(polling): 우리가 주기적으로 물어본다. 만들기 쉽지만, 대부분 "없음"이라 낭비가 많고 주기만큼 늦다.\n・웹훅(webhook): 일이 생기면 상대가 우리가 알려 준 주소로 요청을 보낸다. 즉시 알 수 있고 낭비가 없다. 대신 우리 쪽에 요청을 받을 주소(작은 API 서버나 n8n 의 Webhook 노드)가 있어야 한다.\n상대 시스템이 웹훅을 지원하면 웹훅, 아니면 폴링을 쓴다.',
+     "// 웹훅을 받는 아주 작은 서버 (Node.js)\napp.post('/hooks/order', async (req, res) => {\n  const order = req.body;                  // 상대가 보내 준 주문\n  await sendSlack(`새 주문: ${order.id}`);\n  res.sendStatus(200);                     // 잘 받았다고 답한다\n});"],
+    ex: '웹훅은 "일이 생기면 그쪽에서 알려 주는" 방식이다. 초인종과 같다. 폴링은 문 앞에 누가 왔는지 1분마다 나가 보는 것이다.',
+    w: ['이것은 폴링이다.', null, '자동화가 아니다.', '이것은 정해진 시간에 모아서 처리하는 배치다.'] },
+);
