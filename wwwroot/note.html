@@ -37,6 +37,9 @@ ul { margin: 6px 0; padding-left: 20px; }
 .tip b { font-size: .8em; }
 .fix { border: 1px dashed var(--sub); color: var(--sub); font-size: 14px; }
 .fix::before { content: "보충 · "; font-weight: 700; }
+.err { border-color: var(--red); }
+.err::before { content: "고침 · "; color: var(--red); }
+.err s { opacity: .7; }
 @media (max-width: 600px) { #app { padding-left: 20px; } #app::before { display: none; } h2 { font-size: 30px; } }
 </style>
 <div id="app">
@@ -44,7 +47,7 @@ ul { margin: 6px 0; padding-left: 20px; }
 <h1 class="title">일본어 수업 노트</h1>
 <p class="lead">수업 때 공책에 적은 문법과 문장을 주제별로 옮겨 적었어요. 파란 글씨(일본어)를 누르면 소리로 읽어 줍니다.</p>
 <nav class="toc">
-<a href="#intro">자기소개</a><a href="#josa">조사</a><a href="#verb">동사 3그룹</a><a href="#masu">ます</a><a href="#nai">ない</a><a href="#ta">た</a><a href="#te">て</a><a href="#all">활용 한눈에</a><a href="#mae">前に·後に</a><a href="#koto">~한 적·~할 때</a><a href="#adj">くて·で</a><a href="#kedo">けど</a><a href="#tai">たいです</a><a href="#suki">が すきです</a><a href="#naru">なります</a><a href="#sou">そうだ·らしい</a><a href="#sugiru">すぎる</a><a href="#etc">표현 모음</a><a href="#write">작문</a>
+<a href="#intro">자기소개</a><a href="#josa">조사</a><a href="#verb">동사 3그룹</a><a href="#masu">ます</a><a href="#nai">ない</a><a href="#ta">た</a><a href="#te">て</a><a href="#all">활용 한눈에</a><a href="#mae">前に·後に</a><a href="#koto">~한 적·~할 때</a><a href="#adj">くて·で</a><a href="#kedo">けど</a><a href="#tai">たいです</a><a href="#suki">が すきです</a><a href="#naru">なります</a><a href="#sou">そうだ·らしい</a><a href="#sugiru">すぎる</a><a href="#num">숫자</a><a href="#time">시간</a><a href="#cal">요일·달력</a><a href="#etc">표현 모음</a><a href="#write">작문</a>
 </nav>
 
 <section id="intro">
@@ -84,6 +87,7 @@ ul { margin: 6px 0; padding-left: 20px; }
 <tr><th>2그룹</th><td>① <b>る</b> 로 끝나고 ② る 앞이 <b>い</b>단 · <b>え</b>단</td></tr>
 <tr><th>3그룹</th><td><b>する</b> 하다 · <b>くる</b> 오다</td></tr>
 </table></div>
+<p class="fix">る 앞이 い·え단인데도 1그룹인 예외가 있어요: <b>かえる</b>(돌아가다) · <b>はいる</b>(들어가다) · <b>はしる</b>(달리다) · <b>しる</b>(알다) · <b>きる</b>(자르다) → <b>かえります</b>, <b>かえらない</b>, <b>かえった</b></p>
 </section>
 
 <section id="masu">
@@ -126,7 +130,7 @@ ul { margin: 6px 0; padding-left: 20px; }
 <tr><td><b>いく</b> <i>가다</i></td><td><b>いかない</b></td><td><b>する</b> <i>하다</i></td><td><b>しない</b></td></tr>
 </table></div>
 <h3>문장 만들기</h3>
-<p class="s"><span>① ないです — 안 한다. 커피를 안 마신다</span><b>コーヒーを のまない</b></p>
+<p class="s"><span>① ない — 안 한다(반말) / ないです — 안 합니다. 커피를 안 마신다</span><b>コーヒーを のまない</b> / <b>コーヒーを のまないです</b></p>
 <p class="s"><span>② ないでください — ~하지 말아 주세요. 담배를 피우지 말아 주세요</span><b>タバコを すわないでください</b></p>
 <p class="s"><span>차 안에서 담배를 피우지 말아 주세요</span><b><ruby>車<rt>くるま</rt></ruby>の なかで タバコを すわないでください</b></p>
 </section>
@@ -192,6 +196,7 @@ ul { margin: 6px 0; padding-left: 20px; }
 <tr><td><b><ruby>後<rt>あと</rt></ruby>に</b></td><td>후에</td><td>동사 <u>た형</u> + 後に</td></tr>
 </table></div>
 <p class="s"><span>사기 전에 / 산 후에</span><b>かう まえに</b> / <b>かった あとに</b></p>
+<p class="fix">'~한 후에'는 <b>あとで</b> 를 더 많이 써요 → <b>たべた あとで</b></p>
 <p class="s"><span>남기기 전에</span><b>のこす まえに</b></p>
 <p class="s"><span>먹기 전에</span><b>たべる まえに</b></p>
 <p><b>あびる まえに</b> · <b>みる まえに</b> · <b>わすれる まえに</b> · <b>いく まえに</b> · <b>やすむ まえに</b> · <b>あう まえに</b></p>
@@ -205,9 +210,10 @@ ul { margin: 6px 0; padding-left: 20px; }
 <tr><td><b>~たら</b></td><td>~한다면</td><td>た형으로 바꿔서 + ら <i>예)</i> <b>ねたら</b> 잔다면</td></tr>
 </table></div>
 <p class="s"><span>여행 중에 점심을 먹은 후에 길을 잃은 적이 있다.</span><b>りょこうちゅうに ひるごはんを たべた あとに みちを わすれた ことが あります</b></p>
-<p class="fix">'길을 잃다'는 보통 <b>みちに まよう</b> 라고 해요 → <b>みちに まよった ことが あります</b></p>
+<p class="fix err"><b>みちを わすれる</b> 는 '길을 잊어버리다'예요. '길을 잃다'는 <b>みちに まよう</b> → <b>りょこうちゅうに ひるごはんを たべた あとで、みちに まよった ことが あります</b></p>
 <p class="s"><span>갱년기가 올 때가 있다.</span><b><ruby>更年期<rt>こうねんき</rt></ruby>が <ruby>来<rt>く</rt></ruby>る ときが あります</b></p>
-<p class="s"><span>과거를 기억할 때가 있다.</span><b>かこを きおくする ときが あります</b></p>
+<p class="s"><span>과거를 기억할 때가 있다.</span><b>かこを おもいだす ときが あります</b></p>
+<p class="fix err">공책: <s>かこを きおくする</s> — <b>きおくする</b> 는 '외워서 기억해 두다'예요. 옛일이 떠오르는 건 <b>おもいだす</b></p>
 </section>
 
 <section id="adj">
@@ -234,10 +240,11 @@ ul { margin: 6px 0; padding-left: 20px; }
 <div class="wrap"><table>
 <tr><th></th><th>반말</th><th>존댓말</th></tr>
 <tr><th>명사</th><td>★ <b>だけど</b></td><td><b>ですけど</b></td></tr>
-<tr><th>い형용사</th><td><b>い けど</b></td><td><b>です けど</b></td></tr>
-<tr><th>な형용사</th><td><b>だ けど</b></td><td>だ 지우고 <b>ですけど</b> 를 붙인다</td></tr>
-<tr><th>동사</th><td>원형 + <b>けど</b></td><td><b>ます けど</b></td></tr>
+<tr><th>い형용사</th><td>그대로 + <b>けど</b></td><td>그대로 + <b>ですけど</b></td></tr>
+<tr><th>な형용사</th><td><b>だ</b> + <b>けど</b></td><td>だ 지우고 <b>ですけど</b> 를 붙인다</td></tr>
+<tr><th>동사</th><td>원형 + <b>けど</b></td><td>ます형 + <b>けど</b></td></tr>
 </table></div>
+<p class="fix">예) <b>がくせいだけど</b> / <b>がくせいですけど</b> · <b>おいしいけど</b> / <b>おいしいですけど</b> · <b>ひまだけど</b> / <b>ひまですけど</b> · <b>いくけど</b> / <b>いきますけど</b></p>
 </section>
 
 <section id="tai">
@@ -245,7 +252,8 @@ ul { margin: 6px 0; padding-left: 20px; }
 <p class="tip">ます형에서 ます 빼고 たいです 를 이어 붙인다</p>
 <p><b>いきます</b> → <b>いきたいです</b> · <b>あいます</b> → <b>あいたいです</b> <i>(ます 만드는 법은 <a href="#masu">ます</a> 참고)</i></p>
 <p class="s"><span>친구를 만나고 싶어요. ('만나다'는 に)</span><b>ともだちに あいたいです</b></p>
-<p class="s"><span>일본 여행을 가고 싶다.</span><b>にほんの りょこうに いきたい</b></p>
+<p class="s"><span>일본 여행을 가고 싶다.</span><b>にほんへ りょこうに いきたい</b></p>
+<p class="fix err">공책: <s>にほんの りょこうに</s> — '일본으로 여행을 가다'는 <b>にほんへ りょこうに いく</b> 또는 <b>にほんりょこうに いく</b></p>
 </section>
 
 <section id="suki">
@@ -283,6 +291,7 @@ ul { margin: 6px 0; padding-left: 20px; }
 <tr><th>동사</th><td>ます형에서 <b>ます</b> 떼고 + <b>そうだ</b> / <b>そうです</b></td></tr>
 </table></div>
 <p class="tip">이 표현들을 잘 못 쓰겠다면 <b>~と おもいます</b> 로 통일해서 쓰면 쉽다.</p>
+<p class="fix">とおもいます 앞: 명사·な형용사는 <b>だ</b> 를 붙이고(<b>がくせいだと おもいます</b>, <b>ひまだと おもいます</b>), い형용사·동사는 그대로(<b>おいしいと おもいます</b>, <b>いくと おもいます</b>). そうだ 예외: <b>いい</b> → <b>よさそうです</b></p>
 <p class="s"><span>맛있어 보인다.</span><b>おいしそうです</b></p>
 <p class="s"><span>비가 올 것 같다.</span><b>あめが ふりそうです</b></p>
 <p class="s"><span>~らしいよ — 어디서 들어서 '진짜 그렇다더라'</span><b>~らしいよ</b></p>
@@ -292,11 +301,75 @@ ul { margin: 6px 0; padding-left: 20px; }
 <h2><span>すぎる</span> <small>너무 ~하다</small></h2>
 <p>원래 뜻은 ① 시간이 지나다 ② ~를 지나치다</p>
 <p class="tip">すぎる 는 ①, ②번이 기본인데, 다른 동사가 붙으면 '너무 ~하다'가 된다.</p>
+<p class="fix">붙이는 법: 동사는 ます형에서 ます 떼고(<b>たべます</b> → <b>たべすぎる</b>), い형용사는 い 떼고(<b>たかい</b> → <b>たかすぎる</b>)</p>
 <div class="wrap"><table>
 <tr><td><b>いいすぎる</b></td><td>말이 지나치다</td></tr>
 <tr><td><b>たべすぎる</b></td><td>너무 많이 먹다</td></tr>
-<tr><td><b>ねすぎる</b></td><td>너무 많이 잤다</td></tr>
+<tr><td><b>ねすぎる</b></td><td>너무 많이 자다 <i>— 너무 많이 잤다는</i> <b>ねすぎた</b></td></tr>
 </table></div>
+</section>
+
+<section id="num">
+<h2><span>숫자</span></h2>
+<div class="wrap"><table>
+<tr><td>1 <b>いち</b></td><td>2 <b>に</b></td><td>3 <b>さん</b></td><td>4 <b>よん</b> / <b>し</b></td><td>5 <b>ご</b></td></tr>
+<tr><td>6 <b>ろく</b></td><td>7 <b>なな</b> / <b>しち</b></td><td>8 <b>はち</b></td><td>9 <b>きゅう</b> / <b>く</b></td><td>10 <b>じゅう</b></td></tr>
+</table></div>
+<p>0 <b>ゼロ</b> / <b>れい</b> · 11 <b>じゅういち</b> · 20 <b>にじゅう</b> · 25 <b>にじゅうご</b> · 99 <b>きゅうじゅうきゅう</b></p>
+<h3>백 · 천 · 만 (소리가 바뀌는 곳)</h3>
+<div class="wrap"><table>
+<tr><th>100</th><td><b>ひゃく</b></td><td>300 <b>さんびゃく</b> · 600 <b>ろっぴゃく</b> · 800 <b>はっぴゃく</b></td></tr>
+<tr><th>1,000</th><td><b>せん</b></td><td>3000 <b>さんぜん</b> · 8000 <b>はっせん</b></td></tr>
+<tr><th>10,000</th><td><b>いちまん</b></td><td>'만'이 아니라 꼭 いち 를 붙인다 · 10만 <b>じゅうまん</b></td></tr>
+</table></div>
+<p class="s"><span>얼마예요? — 850엔이에요.</span><b>いくらですか</b> — <b>はっぴゃく ごじゅう えんです</b></p>
+</section>
+
+<section id="time">
+<h2><span>시간</span> <small>~じ ~ふん</small></h2>
+<div class="wrap"><table>
+<tr><td>1시 <b>いちじ</b></td><td>2시 <b>にじ</b></td><td>3시 <b>さんじ</b></td><td>★ 4시 <b>よじ</b></td></tr>
+<tr><td>5시 <b>ごじ</b></td><td>6시 <b>ろくじ</b></td><td>★ 7시 <b>しちじ</b></td><td>8시 <b>はちじ</b></td></tr>
+<tr><td>★ 9시 <b>くじ</b></td><td>10시 <b>じゅうじ</b></td><td>11시 <b>じゅういちじ</b></td><td>12시 <b>じゅうにじ</b></td></tr>
+</table></div>
+<h3>분 — 1 · 3 · 4 · 6 · 8 · 10 은 ぷん</h3>
+<div class="wrap"><table>
+<tr><td>1분 <b>いっぷん</b></td><td>2분 <b>にふん</b></td><td>3분 <b>さんぷん</b></td><td>4분 <b>よんぷん</b></td><td>5분 <b>ごふん</b></td></tr>
+<tr><td>6분 <b>ろっぷん</b></td><td>7분 <b>ななふん</b></td><td>8분 <b>はっぷん</b></td><td>9분 <b>きゅうふん</b></td><td>10분 <b>じゅっぷん</b></td></tr>
+</table></div>
+<p>오전 <b>ごぜん</b> · 오후 <b>ごご</b> · 반 <b>はん</b> · 몇 시 <b>なんじ</b> · 몇 분 <b>なんぷん</b></p>
+<p class="s"><span>지금 몇 시예요? — 오후 4시 반이에요.</span><b>いま なんじですか</b> — <b>ごご よじ はんです</b></p>
+<p class="s"><span>수업은 9시부터 10시 20분까지예요.</span><b>じゅぎょうは くじから じゅうじ にじゅっぷんまでです</b></p>
+</section>
+
+<section id="cal">
+<h2><span>요일 · 달력</span></h2>
+<div class="wrap"><table>
+<tr><td>월 <b>げつようび</b></td><td>화 <b>かようび</b></td><td>수 <b>すいようび</b></td><td>목 <b>もくようび</b></td></tr>
+<tr><td>금 <b>きんようび</b></td><td>토 <b>どようび</b></td><td>일 <b>にちようび</b></td><td>무슨 요일 <b>なんようび</b></td></tr>
+</table></div>
+<h3>월 — ~がつ</h3>
+<div class="wrap"><table>
+<tr><td>1월 <b>いちがつ</b></td><td>2월 <b>にがつ</b></td><td>3월 <b>さんがつ</b></td><td>★ 4월 <b>しがつ</b></td></tr>
+<tr><td>5월 <b>ごがつ</b></td><td>6월 <b>ろくがつ</b></td><td>★ 7월 <b>しちがつ</b></td><td>8월 <b>はちがつ</b></td></tr>
+<tr><td>★ 9월 <b>くがつ</b></td><td>10월 <b>じゅうがつ</b></td><td>11월 <b>じゅういちがつ</b></td><td>12월 <b>じゅうにがつ</b></td></tr>
+</table></div>
+<p class="tip">4는 시각이면 <b>よじ</b>, 월이면 <b>しがつ</b>, 날짜면 <b>よっか</b></p>
+<h3>날짜 — 1~10일은 통째로 외우기</h3>
+<div class="wrap"><table>
+<tr><td>1일 <b>ついたち</b></td><td>2일 <b>ふつか</b></td><td>3일 <b>みっか</b></td><td>4일 <b>よっか</b></td><td>5일 <b>いつか</b></td></tr>
+<tr><td>6일 <b>むいか</b></td><td>7일 <b>なのか</b></td><td>8일 <b>ようか</b></td><td>9일 <b>ここのか</b></td><td>10일 <b>とおか</b></td></tr>
+</table></div>
+<p>11일부터는 숫자 + <b>にち</b> (11일 <b>じゅういちにち</b>). 예외: 14일 <b>じゅうよっか</b> · 20일 <b>はつか</b> · 24일 <b>にじゅうよっか</b> · 며칠 <b>なんにち</b> · 몇 월 <b>なんがつ</b></p>
+<p class="s"><span>생일은 몇 월 며칠이에요? — 7월 7일이에요.</span><b>たんじょうびは なんがつ なんにちですか</b> — <b>しちがつ なのかです</b></p>
+<h3>어제 · 오늘 · 내일</h3>
+<div class="wrap"><table>
+<tr><td>그저께 <b>おととい</b></td><td>어제 <b>きのう</b></td><td>오늘 <b>きょう</b></td><td>내일 <b>あした</b></td><td>모레 <b>あさって</b></td></tr>
+<tr><td></td><td>지난주 <b>せんしゅう</b></td><td>이번 주 <b>こんしゅう</b></td><td>다음 주 <b>らいしゅう</b></td><td></td></tr>
+<tr><td></td><td>지난달 <b>せんげつ</b></td><td>이번 달 <b>こんげつ</b></td><td>다음 달 <b>らいげつ</b></td><td></td></tr>
+<tr><td></td><td>작년 <b>きょねん</b></td><td>올해 <b>ことし</b></td><td>내년 <b>らいねん</b></td><td></td></tr>
+</table></div>
+<p class="s"><span>오늘은 무슨 요일이에요? — 수요일이에요.</span><b>きょうは なんようびですか</b> — <b>すいようびです</b></p>
 </section>
 
 <section id="etc">
@@ -305,44 +378,50 @@ ul { margin: 6px 0; padding-left: 20px; }
 <tr><td><b>できます</b></td><td>할 수 있다</td></tr>
 <tr><td><b>できました</b></td><td>해냈습니다 / 완료했습니다</td></tr>
 <tr><td>(명사) <b><ruby>中<rt>ちゅう</rt></ruby>です</b></td><td>~하는 중입니다 <i>— 무조건 명사가 앞에 붙어야 함</i></td></tr>
-<tr><td><b>ぐあいが わるい</b> / <b>たいちょうが わるい</b></td><td>몸 · 컨디션이 안 좋아 보인다</td></tr>
+<tr><td><b>ぐあいが わるい</b> / <b>たいちょうが わるい</b></td><td>몸 · 컨디션이 안 좋다 <i>— 안 좋아 보인다는</i> <b>ぐあいが わるそうです</b></td></tr>
 <tr><td><b>ちょうし</b> · <b>ぐあい</b></td><td>컨디션 <i>(9번 표현 숙지)</i></td></tr>
 <tr><td><b>ひまだ</b></td><td>한가하다</td></tr>
 <tr><td><b>あんまり</b></td><td>별로, 그다지</td></tr>
 </table></div>
 <h3>얼마에 몇 번</h3>
 <div class="wrap"><table>
-<tr><td>한 달에 한 번</td><td><b>いっかげつで いっかい</b></td><td><b>○かげつ で ○かい</b></td></tr>
-<tr><td>한 주에 ○번</td><td colspan="2"><b>いっしゅうかん で ○かい</b></td></tr>
-<tr><td>하루에 ○번</td><td colspan="2"><b>いちにち で ○かい</b></td></tr>
+<tr><td>한 달에 한 번</td><td><b>いっかげつに いっかい</b></td><td><b>○かげつ に ○かい</b></td></tr>
+<tr><td>한 주에 ○번</td><td colspan="2"><b>いっしゅうかん に ○かい</b></td></tr>
+<tr><td>하루에 ○번</td><td colspan="2"><b>いちにち に ○かい</b></td></tr>
 </table></div>
-<p class="fix">'~에 몇 번'은 <b>に</b> 도 많이 써요 → <b>いっかげつに いっかい</b></p>
+<p class="fix err">공책: <s>いっかげつで いっかい</s> — '얼마 동안에 몇 번'(빈도)은 で 가 아니라 <b>に</b> 를 써요.</p>
 </section>
 
 <section id="write">
 <h2><span>작문</span> <small>내가 만든 문장</small></h2>
 <h3>취미에 대해서 이야기해 봅시다</h3>
-<p class="s"><span>다양한 아이디어가 있는 웹, 앱 서비스를 만드는 것이 취미입니다.</span><b>たような アイデアが ある ウェブサイトを つくる ものが できます</b></p>
-<p class="fix">'만드는 것이 취미입니다'는 <b>つくるのが しゅみです</b></p>
+<p class="s"><span>다양한 아이디어가 있는 웹, 앱 서비스를 만드는 것이 취미입니다.</span><b>いろいろな アイデアで ウェブや アプリの サービスを つくるのが しゅみです</b></p>
+<p class="fix err">공책: <s>たような アイデアが ある ウェブサイトを つくる ものが できます</s> — '~하는 것'은 もの 가 아니라 <b>の</b> / <b>こと</b>, <b>できます</b> 는 '할 수 있다'라서 취미는 <b>しゅみです</b></p>
 
 <h3>좋아하는 음식</h3>
-<p class="s"><span>집 근처에 가격이 저렴하고 요리를 잘하는 곳이 있어서, 그 상점의 탕수육을 좋아합니다.</span><b>いえの ちかくで やすくて、りょうりが じょうずな ばしょが あるので、あの みせの すぶたが すきです</b></p>
+<p class="s"><span>집 근처에 가격이 저렴하고 요리를 잘하는 곳이 있어서, 그 상점의 탕수육을 좋아합니다.</span><b>いえの ちかくに やすくて りょうりが じょうずな みせが あるので、その みせの すぶたが すきです</b></p>
+<p class="fix err">공책: <s>ちかくで … ばしょが あるので、あの みせ</s> — '~에 있다'는 <b>に ある</b>(で 는 동작하는 곳), 가게는 <b>みせ</b>, 방금 말한 '그 가게'는 <b>その みせ</b></p>
 
 <h3>회사</h3>
-<p class="s"><span>자유를 못 느껴서, 회사에서 일하는 것이 싫어졌다.</span><b>じゆうを かんじられませんから、かいしゃで はたらくのが きらいです</b></p>
+<p class="s"><span>자유를 못 느껴서, 회사에서 일하는 것이 싫어졌다.</span><b>じゆうを かんじられないので、かいしゃで はたらくのが きらいに なりました</b></p>
+<p class="fix err">공책: <s>はたらくが きらいです</s> — 동사 뒤에는 <b>の</b> 를 넣어 <b>はたらくのが</b>, '싫어졌다'는 <b>きらいに なりました</b>(な형용사 + に なる)</p>
 
 <h3>일요일</h3>
-<p class="s"><span>일요일은 컨디션은 양호하고, 수업이 끝난 후, 한가하고, 자유롭다.</span><b>にちようびは、ちょうしは よくて、じゅぎょうが おわった あと、ひまで、じゆうです</b></p>
+<p class="s"><span>일요일은 컨디션은 양호하고, 수업이 끝난 후, 한가하고, 자유롭다.</span><b>にちようびは、ちょうしが よくて、じゅぎょうが おわった あと、ひまで、じゆうです</b></p>
+<p class="fix err">공책: <s>ちょうしは よくて、じゅぎょう おわった</s> — <b>ちょうしが いい</b> 처럼 が 를 쓰고, <b>じゅぎょうが</b> 의 が 가 빠졌어요.</p>
 
 <h3>지금까지 가장 맛있었던 음식</h3>
-<p class="s"><span>뉴욕에서 먹었던 랍스터롤이 가장 좋았다. 빵에 랍스터를 넣어 먹는 건데, 이건 먹어야 맛을 알 수 있다.</span><b>ニューヨークで たべた ロブスターロールが いちばん すきでした。パンに ロブスターを <ruby>入<rt>い</rt></ruby>れて たべる ものですけど、これは たべなかったら、あじを わからないです</b></p>
-<p class="tip"><b>わからないです</b> 모른다 · <b>わかれないです</b> 알 수 없다 · <b>あじ</b> 맛 · <b>りょうり</b> 요리</p>
+<p class="s"><span>뉴욕에서 먹었던 랍스터롤이 가장 좋았다. 빵에 랍스터를 넣어 먹는 건데, 이건 먹어야 맛을 알 수 있다.</span><b>ニューヨークで たべた ロブスターロールが いちばん すきでした。パンに ロブスターを <ruby>入<rt>い</rt></ruby>れて たべる ものですけど、これは たべて みないと、あじが わかりません</b></p>
+<p class="fix err">공책: <s>たべなかったら、あじを わからないです / わかれないです</s> — <b>わかる</b> 는 を 가 아니라 <b>が</b>, '먹어 봐야 안다'는 <b>たべて みないと わからない</b>. <b>わかる</b> 는 그 자체로 '알 수 있다'라서 가능형이 없어요(<b>わかれない</b> 는 '헤어지지 않다').</p>
+<p class="tip"><b>あじ</b> 맛 · <b>りょうり</b> 요리</p>
 
 <h3>만나고 싶은 사람</h3>
 <p class="s"><span>만날 수는 없지만, 이재용을 만나고 싶습니다. 그래서 노력 중입니다.</span><b>あえないけど、</b>이재용<b>に あいたいです。それで、どりょく<ruby>中<rt>ちゅう</rt></ruby>です</b></p>
+<p class="fix err">공책: <s>ろうりょく中</s> — 노력은 <b>どりょく</b></p>
 
 <h3>만약 복권에 당첨되면</h3>
-<p class="s"><span>만약 복권에 당첨되어, 회사를 그만두고 여행을 잠시 가고 싶다.</span><b>もし たからくじが あたって、かいしゃを やめて、りょこうに ちょっと いきたいです</b></p>
+<p class="s"><span>만약 복권에 당첨되어, 회사를 그만두고 여행을 잠시 가고 싶다.</span><b>もし たからくじが あたったら、かいしゃを やめて、ちょっと りょこうに いきたいです</b></p>
+<p class="fix err">'만약 ~면'은 て 가 아니라 <b>たら</b> → <b>あたったら</b>. 여행을 가다는 <b>りょこうに いく</b>, 싶다는 <b>いきたい</b>(공책: <s>りょこうを … いきたです</s>)</p>
 </section>
 </div>
 <script>
