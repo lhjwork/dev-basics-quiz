@@ -26,9 +26,7 @@ async function login() {
 function jaNav() {
   const nav = el('div', null, 'jnav');
   const btn = (label, fn) => { const b = el('button', label); b.onclick = fn; nav.append(b); };
-  if (JA) btn('내 단어장', () => go('words'));
-  if (JA) btn('수업 노트', () => { location.href = 'note.html'; });
-  btn('성장 기록', () => go('stats'));
+  if (JA) btn('내 단어장', () => go('words'));  btn('성장 기록', () => go('stats'));
   nav.append(el('span', loggedIn ? '기록 중: 푼 문제가 저장됩니다' : '로그인하면 푼 문제' + (JA ? '와 단어장이' : '가') + ' 저장돼요', 'meta'));
   if (!loggedIn) btn('로그인', async () => { if (await login()) home(); });
   return nav;

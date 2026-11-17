@@ -197,6 +197,9 @@ function home() {
     a.href = href;
     tabs.append(a);
   });
+  const note = el('a', '수업 노트');   // 일본어 수업 노트(정적 페이지)
+  note.href = '/note.html';
+  tabs.append(note);
   app.replaceChildren(
     tabs,
     el('h1', document.title, 'title'),
